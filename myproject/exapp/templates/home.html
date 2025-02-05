@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="website-icon" type="png" href="images\logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7fc;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            background-color: #2c3e50;
+            padding-top: 30px;
+            transition: all 0.3s;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: all 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+            border-left: 4px solid #3498db;
+        }
+
+        .sidebar a i {
+            margin-right: 10px;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        /* Card Styling */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background-color: #3498db;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+            padding: 15px 20px;
+            border-bottom: none;
+        }
+
+        .card-body {
+            background-color: white;
+            padding: 25px;
+        }
+
+        .card-body h5 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .card-body p {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+
+        /* Logout Link */
+        .logout-link {
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-link:hover {
+            color: #c0392b;
+        }
+
+        /* Chart Styling */
+        .chart-container {
+            margin-top: 40px;
+        }
+
+        canvas {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h4 class="text-white text-center mb-4">Admin Dashboard</h4>
+    <a href="#"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="{% url 'exapp:totalsolutions' %}"><i class="fas fa-cogs"></i> Totalsolutions</a>
+    <a href="{% url 'exapp:boq' %}"><i class="fas fa-file-invoice"></i> BOQ</a>
+    <a href="#"><i class="fas fa-chart-bar"></i> Reports</a>
+
+    <!-- Logout as Clickable Link -->
+    <form action="{% url 'exapp:logout' %}" method="post" class="mt-auto">
+        {% csrf_token %}
+        <a href="#" class="logout-link" onclick="this.closest('form').submit();"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </form>
+</div>
+
+<!-- Main Content -->
+<div class="content">
+    <h2 class="mb-4">Dashboard Overview</h2>
+
+    <!-- Dashboard Cards -->
+    <div class="row">
+        <!-- Card 1 - Total Items -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-boxes me-2"></i> Total Items
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_items }}</h5>
+                    <p class="card-text">Total Number of Items</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 - Total Softwares -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-laptop-code me-2"></i> Total Softwares
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ category_software }}</h5>
+                    <p class="card-text">Software Solutions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 - Total Hardwares -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-microchip me-2"></i> Total Hardwares
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ category_hardware }}</h5>
+                    <p class="card-text">Hardware Solutions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4 - Total Services -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-concierge-bell me-2"></i> Total Services
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ category_services }}</h5>
+                    <p class="card-text">Service Solutions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mt-4">
+        <!-- Chart 1 (Services Breakdown) -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-2"></i> Services Breakdown
+                </div>
+                <div class="card-body">
+                    <canvas id="serviceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2 (BOQ) -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-file-invoice-dollar me-2"></i> BOQ
+                </div>
+                <div class="card-body">
+                    <canvas id="emailChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+<!-- Chart.js Script -->
+<script id="chart-data" type="application/json">
+    {
+        "category_software": {{  category_software|default:0 }},
+        "category_hardware": {{ category_hardware|default:0 }},
+        "category_services": {{ category_services|default:0 }},
+        "two_wheeler_count": {{ two_wheeler_count|default:0 }},
+        "four_wheeler_count": {{ four_wheeler_count|default:0 }}
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const data = JSON.parse(document.getElementById('chart-data').textContent);
+
+        const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+        new Chart(serviceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Software', 'Hardware', 'Service'],
+                datasets: [{
+                    label: 'Services Breakdown',
+                    data: [data.category_software, data.category_hardware, data.category_services],
+                    backgroundColor: ['#3498db', '#e74c3c', '#2ecc71']
+                }]
+            },
+            options: { 
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Services Distribution'
+                    }
+                }
+            }
+        });
+
+        const emailCtx = document.getElementById('emailChart').getContext('2d');
+        new Chart(emailCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Category 1', 'Category 2'],
+                datasets: [{
+                    label: 'BOQ Breakdown',
+                    data: [data.two_wheeler_count, data.four_wheeler_count],
+                    backgroundColor: ['#3498db', '#e74c3c']
+                }]
+            },
+            options: { 
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'BOQ Categories'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
