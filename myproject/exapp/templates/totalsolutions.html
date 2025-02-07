@@ -300,94 +300,94 @@
 
         
 
-        <div class="table-container ">
-            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>SL No</th>
-                        <th>Applications</th>
-                        <th>Category</th>
-                        <th>Product Name</th>
-                        <th>Make</th>
-                        <th>Model</th>
-                        <th>Specification</th>
-                        <th>UOM</th>
-                        <th>Buying Price</th>
-                        <th>Vendor</th>
-                        <th>Quotation Received Month</th>
-                        <th>Lead Time</th>
-                        <th>Remarks</th>
-                        <th>List Price</th>
-                        <th>Discount</th>
-                        <th>Sales Price</th>
-                        <th>Sales Margin</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                  {% for obj in objs %}
-                    <tr>
-                        <td>{{forloop.counter}}</td>
-                        <td>{{obj.application}}</td>
-                        <td>{{obj.category}}</td>
-                        <td>{{obj.product_name}}</td>
-                        <td>{{obj.make}}</td>
-                        <td>{{obj.model}}</td>
-                        <td>{{obj.specification}}</td>
-                        <td>{{obj.uom}}</td>
-                        <td>
-                            <div class="buying-price-input"
-                            data-row-id="{{ obj.id }}"
-                            data-field="buying_price"
-                            contenteditable="true"
-                            onblur="updateField(this)">
-                            {{ obj.buying_price }}
-                            </div>
-
-                        </td>
-                        <td>{{obj.vendor}}</td>
-                        <td>{{obj.quotation_received_month}}</td>
-                        <td>{{obj.lead_time}}</td>
-                        <td>{{obj.remarks}}</td>
-                        <td>{{obj.list_price}}</td>
-                        <td>
-                            <div class="discount-input"
-                            data-row-id="{{ obj.id }}"
-                            data-field="discount"
-                            contenteditable="true"
-                            onblur="updateField(this)">
-                            {{ obj.discount }}
-                            </div>
-
-                        <td>
-
-                            <div class="sales-price-input"
-                            data-row-id="{{ obj.id }}"
-                            data-field="sales_price"
-                            contenteditable="true"
-                            onblur="updateField(this)">
-                            {{ obj.sales_price }}
-                            </div>
-                            
-
-                        </td>
-                        <td>
-
-                            <div class="sales-margin-input"
-                            data-row-id="{{ obj.id }}"
-                            data-field="sales_margin"
-                            contenteditable="true"
-                            onblur="updateField(this)">
-                            {{ obj.sales_margin }}
-                            </div>
-
-                        </td>
-                        <td>
-                            <a href="#editTotalsolutionsModal-{{forloop.counter}}" class="btn btn-sm btn-outline-success edit-btn" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-                            <a href="#deleteTotalsolutionsModal-{{forloop.counter}}" class="btn btn-sm btn-outline-danger delete-btn" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
-                           
+<div class="table-container">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>SL No</th>
+                <th>Applications</th>
+                <th>Category</th>
+                <th>Product Name</th>
+                <th>Make</th>
+                <th>Model</th>
+                <th>Specification</th>
+                <th>UOM</th>
+                <th>Buying Price</th>
+                <th>Vendor</th>
+                <th>Quotation Received Month</th>
+                <th>Lead Time</th>
+                <th>Remarks</th>
+                <th>List Price</th>
+                <th>Discount</th>
+                <th>Sales Price</th>
+                <th>Sales Margin</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj in objs %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ obj.application }}</td>
+                <td>{{ obj.category }}</td>
+                <td>{{ obj.product_name }}</td>
+                <td>{{ obj.make }}</td>
+                <td>{{ obj.model }}</td>
+                <td>{{ obj.specification }}</td>
+                <td>{{ obj.uom }}</td>
+                <td>
+                    <div class="buying-price-input"
+                         data-row-id="{{ obj.id }}"
+                         data-field="buying_price"
+                         contenteditable="true"
+                         onblur="updateField(this)">
+                        {{ obj.buying_price }}
+                    </div>
+                </td>
+                <td>{{ obj.vendor }}</td>
+                <td>{{ obj.quotation_received_month }}</td>
+                <td>{{ obj.lead_time }}</td>
+                <td>{{ obj.remarks }}</td>
+                <td>{{ obj.list_price }}</td>
+                <td>
+                    <div class="discount-input"
+                         data-row-id="{{ obj.id }}"
+                         data-field="discount"
+                         contenteditable="true"
+                         onblur="updateField(this)">
+                        {{ obj.discount }}
+                    </div>
+                </td>
+                <td>
+                    <div class="sales-price-input"
+                         data-row-id="{{ obj.id }}"
+                         data-field="sales_price"
+                         contenteditable="true"
+                         onblur="updateField(this)">
+                        {{ obj.sales_price }}
+                    </div>
+                </td>
+                <td>
+                    <div class="sales-margin-input"
+                         data-row-id="{{ obj.id }}"
+                         data-field="sales_margin"
+                         contenteditable="true"
+                         onblur="updateField(this)">
+                        {{ obj.sales_margin }}
+                    </div>
+                </td>
+                <td>
+                    <a href="#editTotalsolutionsModal-{{ forloop.counter }}" 
+                       class="btn btn-sm btn-outline-success edit-btn" 
+                       data-toggle="modal">
+                        <i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
+                    </a>
+                    <a href="#deleteTotalsolutionsModal-{{ forloop.counter }}" 
+                       class="btn btn-sm btn-outline-danger delete-btn" 
+                       data-toggle="modal">
+                        <i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
+                    </a>
                             <!-- these is Edit model -->
 
                             <div id="editTotalsolutionsModal-{{forloop.counter}}" class="modal fade">
@@ -591,54 +591,35 @@
 function updateField(element) {
     const rowId = element.dataset.rowId;
     const field = element.dataset.field;
-    const value = element.innerText;
+    const value = element.innerText.trim();
 
-    $('#loadingSpinner').show();
+    if (!rowId || !field) {
+        console.error("Invalid data attributes.");
+        return;
+    }
 
-    $.ajax({
-        url: '/update-field/',  // Replace with your actual update URL
-        method: 'POST',
-        data: {
+    fetch("/update-field/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        },
+        body: JSON.stringify({
             id: rowId,
             field: field,
-            value: value,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function(response) {
-            if (response.status === 'success') {
-                showMessage('Field updated successfully', 'success');
-            } else {
-                showMessage('Error updating field', 'error');
-            }
-        },
-        error: function() {
-            showMessage('Error updating field', 'error');
-        },
-        complete: function() {
-            $('#loadingSpinner').hide();
+            value: value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            console.log("Field updated successfully:", data.updated_value);
+        } else {
+            console.error("Error updating field:", data.message);
         }
-    });
+    })
+    .catch(error => console.error("Server error:", error));
 }
-
-function showMessage(message, type) {
-    const messageBox = $('<div>').addClass('message-box').addClass(type).text(message);
-    $('body').append(messageBox);
-    messageBox.fadeIn().delay(3000).fadeOut(function() {
-        $(this).remove();
-    });
-}
-
-// Add event listener for Enter key to trigger updateField
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[contenteditable]').forEach(element => {
-        element.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // Prevent default Enter behavior
-                updateField(this); // Trigger the updateField function
-            }
-        });
-    });
-});
 
 
 

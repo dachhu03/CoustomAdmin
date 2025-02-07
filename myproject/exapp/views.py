@@ -266,29 +266,40 @@ def upload_file(request):
     
         return redirect(f"{reverse('exapp:totalsolutions')}?category={category_filter}&search={search_query}")
 
-@login_required
-def update_row(request):
-    if request.method == 'POST':
+def update_field(request):
+    if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            row_id = data.get('row_id')
-            field = data.get('field')
-            value = data.get('value')
+            data = json.loads(request.body)  # Get JSON data
+            row_id = data.get("id")
+            field = data.get("field")
+            value = data.get("value")
 
-            # Validate row_id and field
-            obj = Totalsolutions.objects.get(pk=row_id)
-            if not hasattr(obj, field):
-                return JsonResponse({'success': False, 'error': f"Field {field} does not exist on Totalsolutions"})
+            obj = get_object_or_404(Totalsolutions, id=row_id)
 
-            setattr(obj, field, value)  # Update field
-            obj.save()
-            return JsonResponse({'success': True})
-        except Totalsolutions.DoesNotExist:
-            return JsonResponse({'success': False, 'error': f"Totalsolutions object with ID {row_id} does not exist"})
+            if hasattr(obj, field):
+                field_type = obj._meta.get_field(field).get_internal_type()
+
+                # Convert the value to the appropriate type
+                if field_type in ["IntegerField", "PositiveIntegerField"]:
+                    value = int(value)
+                elif field_type in ["FloatField", "DecimalField"]:
+                    value = float(value)
+                elif field_type == "BooleanField":
+                    value = value.lower() in ["true", "1"]
+                else:
+                    value = str(value)  # Default to string for text fields
+
+                setattr(obj, field, value)
+                obj.save(update_fields=[field])  # Save only the updated field
+
+                return JsonResponse({"status": "success", "updated_value": value})
+
+            return JsonResponse({"status": "error", "message": "Invalid field"}, status=400)
+
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
 
 def boq(request):
     return render(request, 'boq.html', {})
