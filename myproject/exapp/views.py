@@ -93,6 +93,13 @@ def additem(request):
         return redirect('exapp:totalsolutions')
     return render(request, 'totalsolutions.html')
 
+
+def delete_all(request):
+    if request.method == 'POST':
+        Totalsolutions.objects.all().delete()
+        messages.success(request, 'All items have been deleted successfully.')
+    return redirect('exapp:totalsolutions')  # Redirect to the totalsolutions page
+
 @login_required
 def delete(request, id):
     item = get_object_or_404(Totalsolutions, id=id)

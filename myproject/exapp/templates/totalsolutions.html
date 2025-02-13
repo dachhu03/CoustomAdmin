@@ -162,6 +162,10 @@
 
             <a class="btn custom-blue-btn ml-3 custom-space" data-toggle="modal" data-target="#uploadModal">Upload</a>
 
+            <a class="btn btn-danger ml-3" data-toggle="modal" data-target="#deleteAllModal">Delete All</a>
+        
+
+
            
         </div>
 
@@ -305,24 +309,24 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>SL No</th>
-                <th>Applications</th>
-                <th>Category</th>
-                <th>Product Name</th>
-                <th>Make</th>
-                <th>Model</th>
-                <th>Specification</th>
-                <th>UOM</th>
-                <th>Buying Price</th>
-                <th>Vendor</th>
-                <th>Quotation Received Month</th>
-                <th>Lead Time</th>
-                <th>Remarks</th>
-                <th>List Price</th>
-                <th>Discount</th>
-                <th>Sales Price</th>
-                <th>Sales Margin</th>
-                <th>Actions</th>
+                <th class="col-sl">SL No</th>
+                <th class="col-app">Applications</th>
+                <th class="col-cat">Category</th>
+                <th class="col-prod">Product Name</th>
+                <th class="col-make">Make</th>
+                <th class="col-model">Model</th>
+                <th class="col-spec">Specification</th>
+                <th class="col-uom">UOM</th>
+                <th class="col-price">Buying Price</th>
+                <th class="col-vendor">Vendor</th>
+                <th class="col-date">Quotation Date</th>
+                <th class="col-time">Lead Time</th>
+                <th class="col-remarks">Remarks</th>
+                <th class="col-price">List Price</th>
+                <th class="col-price">Discount</th>
+                <th class="col-price">Sales Price</th>
+                <th class="col-price">Sales Margin</th>
+                <th class="col-actions">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -497,6 +501,35 @@
                                     </div>
                                 </div>
                             </div>
+
+
+
+                            <div id="deleteAllModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <form method="POST" action="{% url 'exapp:delete_all' %}">
+                                            {% csrf_token %}
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="deleteAllModalLabel">Delete All Items</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete all items? This action cannot be undone.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-danger">Delete All</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                    
+
+
+                            
 
 
                            
