@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse ,  HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login
 from .models import Totalsolutions
@@ -15,26 +15,21 @@ import secrets
 from django.core.exceptions import ValidationError
 
 
-
 @login_required
 def home(request):
     total_items = Totalsolutions.objects.count()
     category_software = Totalsolutions.objects.filter(category="software").count()
-    category_hardware = Totalsolutions.objects.filter(category="hardware").count() 
-    category_services = Totalsolutions.objects.filter(category="service").count() 
-
-    
+    category_hardware = Totalsolutions.objects.filter(category="hardware").count()
+    category_services = Totalsolutions.objects.filter(category="service").count()
 
     context = {
         "total_items": total_items,
         "category_software": category_software,
         "category_hardware": category_hardware,
         "category_services": category_services,
-        # "total_sales_price": total_sales_price,
-        # "top_vendors": top_vendors,
-        # "monthly_sales": monthly_sales,
     }
     return render(request, "home.html", context)
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -43,81 +38,125 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('exapp:home')  # Redirect to home page
+            return redirect('exapp:home')
         else:
             messages.error(request, "Invalid username or password.")
     return render(request, 'login.html')
-@login_required
+
+
 def totalsolutions(request):
-    # Get search query parameters
     search_query = request.GET.get('search', '')
     category_filter = request.GET.get('category', 'all')
     
-    # Filter the products based on the search query and category
     products = Totalsolutions.objects.all()
     
     if search_query:
-        products = products.filter(application__icontains=search_query)
+        products = products.filter(product_name__icontains=search_query)
     
     if category_filter != 'all':
         products = products.filter(category=category_filter)
     
+    category_options = ['all', 'software', 'hardware', 'services']
+    
     return render(request, 'totalsolutions.html', {
         'objs': products,
         'category_filter': category_filter,
-        'search_query': search_query
+        'search_query': search_query,
+        'category_options': category_options
     })
+
+
+@login_required
+def search_products(request):
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', 'all')
+    
+    products = Totalsolutions.objects.all()
+    
+    if search_query:
+        products = products.filter(product_name__icontains=search_query)
+    
+    if category_filter != 'all':
+        products = products.filter(category=category_filter)
+    
+    data = [
+        {
+            'id': obj.id,
+            'application': obj.application,
+            'category': obj.category,
+            'product_name': obj.product_name,
+            'make': obj.make,
+            'model': obj.model,
+            'specification': obj.specification,
+            'uom': obj.uom,
+            'buying_price': float(obj.buying_price),
+            'vendor': obj.vendor,
+            'quotation_received_month': obj.quotation_received_month,
+            'lead_time': obj.lead_time,
+            'remarks': obj.remarks,
+            'list_price': float(obj.list_price),
+            'discount': int(obj.discount),
+            'sales_price': float(obj.sales_price),
+            'sales_margin': int(obj.sales_margin),
+        } for obj in products
+    ]
+    
+    return JsonResponse({'products': data})
+
 
 @login_required
 def additem(request):
     if request.method == 'POST':
-        # Create the item and save it
-        Totalsolutions.objects.create(
-            application=request.POST.get('application'),
-            category=request.POST.get('category'),
-            product_name=request.POST.get('product_name'),
-            make=request.POST.get('make'),
-            model=request.POST.get('model'),
-            specification=request.POST.get('specification'),
-            uom=request.POST.get('uom'),
-            buying_price=request.POST.get('buying_price'),
-            vendor=request.POST.get('vendor'),
-            quotation_received_month=request.POST.get('quotation_received_month'),
-            lead_time=request.POST.get('lead_time'),
-            remarks=request.POST.get('remarks'),
-            list_price=request.POST.get('list_price'),
-            discount=request.POST.get('discount'),
-            sales_price=request.POST.get('sales_price'),
-            sales_margin=request.POST.get('sales_margin'),
-        )
+        try:
+            Totalsolutions.objects.create(
+                application=request.POST.get('application'),
+                category=request.POST.get('category'),
+                product_name=request.POST.get('product_name'),
+                make=request.POST.get('make'),
+                model=request.POST.get('model'),
+                specification=request.POST.get('specification'),
+                uom=request.POST.get('uom'),
+                buying_price=float(request.POST.get('buying_price', 0)),
+                vendor=request.POST.get('vendor'),
+                quotation_received_month=request.POST.get('quotation_received_month'),
+                lead_time=request.POST.get('lead_time'),
+                remarks=request.POST.get('remarks'),
+                list_price=float(request.POST.get('list_price', 0)),
+                discount=int(float(request.POST.get('discount', 0))),
+                sales_price=float(request.POST.get('sales_price', 0)),
+                sales_margin=int(float(request.POST.get('sales_margin', 0))),
+            )
+            messages.success(request, "Item added successfully.")
+        except (ValueError, IntegrityError) as e:
+            messages.error(request, f"Error adding item: {str(e)}")
         return redirect('exapp:totalsolutions')
     return render(request, 'totalsolutions.html')
 
 
+@login_required
 def delete_all(request):
     if request.method == 'POST':
         Totalsolutions.objects.all().delete()
         messages.success(request, 'All items have been deleted successfully.')
-    return redirect('exapp:totalsolutions')  # Redirect to the totalsolutions page
+    return redirect('exapp:totalsolutions')
+
 
 @login_required
 def delete(request, id):
     item = get_object_or_404(Totalsolutions, id=id)
-
     if request.method == 'POST':
-        item_name = str(item)  # Get the name or representation of the item for the message
+        item_name = str(item)
         item.delete()
         messages.success(request, f'The item "{item_name}" has been successfully deleted.')
         return redirect('exapp:totalsolutions')
-    
     return render(request, 'totalsolutions.html', {'item': item})
+
 
 @login_required
 def edit(request, id):
     item = get_object_or_404(Totalsolutions, id=id)
 
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Handle AJAX request
         try:
             data = json.loads(request.body)
             field = data.get('field')
@@ -129,51 +168,42 @@ def edit(request, id):
                 'quotation_received_month', 'lead_time', 'remarks',
                 'list_price', 'discount', 'sales_price', 'sales_margin'
             ]:
-                # Validate and update the field
                 if field == 'list_price':
-                    value = max(float(value), 0)  # Ensure list_price is non-negative
+                    value = max(float(value), 0)
                 elif field == 'discount':
-                    value = value.replace('%', '') if isinstance(value, str) and '%' in value else value
-                    discount = max(float(value) / 100, 0)  # Convert to decimal and ensure non-negative
-                    value = discount * 100  # Store discount as a percentage
-
-                    # Recalculate sales_price and sales_margin
-                    list_price = item.list_price
-                    sales_price = max(list_price - (list_price * discount), 0)  # Ensure non-negative sales_price
-                    buying_price = item.buying_price
-                    sales_margin = (sales_price - buying_price) / sales_price if sales_price > 0 else 0
-
+                    value = int(float(value.replace('%', '')))
+                    list_price = float(item.list_price)
+                    sales_price = max(list_price - (list_price * value / 100), 0)
+                    buying_price = float(item.buying_price)
+                    sales_margin = int((sales_price - buying_price) / sales_price * 100) if sales_price > 0 else 0
                     item.sales_price = sales_price
                     item.sales_margin = sales_margin
+                elif field == 'sales_margin':
+                    value = int(float(value))
 
                 setattr(item, field, value)
                 item.save()
 
-                return JsonResponse({'success': True, 'message': f'{field} updated successfully.'})
+                return JsonResponse({
+                    'success': True,
+                    'message': f'{field} updated successfully.',
+                    'sales_price': item.sales_price,
+                    'sales_margin': item.sales_margin
+                })
             else:
                 return JsonResponse({'success': False, 'message': 'Invalid field.'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)})
 
     if request.method == 'POST':
-        # Handle regular form submissions
         try:
-            # Validate and get inputs
             list_price = max(float(request.POST.get('list_price', 0)), 0)
             discount_value = request.POST.get('discount', '0').replace('%', '')
-
-            try:
-                discount = max(float(discount_value) / 100, 0)  # Convert to decimal and ensure non-negative
-            except ValueError:
-                discount = 0  # Default to 0 if invalid
-
+            discount = int(float(discount_value)) if discount_value else 0
             buying_price = max(float(request.POST.get('buying_price', 0)), 0)
+            sales_price = max(list_price - (list_price * discount / 100), 0)
+            sales_margin = int((sales_price - buying_price) / sales_price * 100) if sales_price > 0 else 0
 
-            # Calculate sales price and margin
-            sales_price = max(list_price - (list_price * discount), 0)
-            sales_margin = (sales_price - buying_price) / sales_price if sales_price > 0 else 0
-
-            # Update item fields
             item.application = request.POST.get('application')
             item.category = request.POST.get('category')
             item.product_name = request.POST.get('product_name')
@@ -187,22 +217,19 @@ def edit(request, id):
             item.lead_time = request.POST.get('lead_time')
             item.remarks = request.POST.get('remarks')
             item.list_price = list_price
-            item.discount = discount * 100  # Store discount as percentage
+            item.discount = discount
             item.sales_price = sales_price
             item.sales_margin = sales_margin
             item.save()
 
-            # Add success message
             item_name = str(item)
             messages.success(request, f'The item "{item_name}" has been successfully updated.')
             return redirect('exapp:totalsolutions')
-
         except Exception as e:
             messages.error(request, f'Error updating item: {str(e)}')
             return redirect('exapp:totalsolutions')
 
     return render(request, 'totalsolutions.html', {'item': item})
-
 
 
 @login_required
@@ -212,9 +239,9 @@ def upload_file(request):
 
     if request.method == 'POST':
         file = request.FILES.get('file')
+        category_filter = request.POST.get('category', 'all')
         if file:
             try:
-                # Check file extension
                 if file.name.endswith('.csv'):
                     df = pd.read_csv(file)
                 elif file.name.endswith(('.xls', '.xlsx')):
@@ -222,10 +249,8 @@ def upload_file(request):
                 else:
                     raise ValueError("Unsupported file format. Please upload a CSV or Excel file.")
                 
-                # Clean the category column
                 df['category'] = df['category'].str.strip().str.lower()
 
-                # Validate required columns
                 required_columns = [
                     'application', 'category', 'product_name', 'make', 'model', 'specification',
                     'uom', 'buying_price', 'vendor', 'quotation_received_month',
@@ -235,11 +260,9 @@ def upload_file(request):
                 if missing_columns:
                     raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
                 
-                # Filter the DataFrame based on the category_filter
                 if category_filter != 'all' and category_filter in ['software', 'hardware', 'services']:
                     df = df[df['category'] == category_filter.lower()]
                 
-                # Track skipped and saved rows
                 skipped_duplicates = []
                 saved_entries = 0
 
@@ -254,7 +277,10 @@ def upload_file(request):
                         ).exists()
 
                         if not exists:
-                            Totalsolutions.objects.create(**row.to_dict())
+                            row_dict = row.to_dict()
+                            row_dict['discount'] = int(float(row_dict.get('discount', 0)))
+                            row_dict['sales_margin'] = int(float(row_dict.get('sales_margin', 0)))
+                            Totalsolutions.objects.create(**row_dict)
                             saved_entries += 1
                         else:
                             skipped_duplicates.append(row.to_dict())
@@ -273,53 +299,94 @@ def upload_file(request):
     
         return redirect(f"{reverse('exapp:totalsolutions')}?category={category_filter}&search={search_query}")
 
+
+@csrf_exempt
+@login_required
 def update_field(request):
     if request.method == "POST":
         try:
-            data = json.loads(request.body)  # Get JSON data
-            row_id = data.get("id")
-            field = data.get("field")
-            value = data.get("value")
+            data = json.loads(request.body)
+            updates = data.get("updates", {})
 
-            obj = get_object_or_404(Totalsolutions, id=row_id)
+            if not updates:
+                return JsonResponse({"status": "error", "message": "No updates provided"}, status=400)
 
-            if hasattr(obj, field):
-                field_type = obj._meta.get_field(field).get_internal_type()
+            updated_values = {}
+            for row_id, fields in updates.items():
+                obj = get_object_or_404(Totalsolutions, id=row_id)
+                update_fields = []
 
-                # Convert the value to the appropriate type
-                if field_type in ["IntegerField", "PositiveIntegerField"]:
-                    value = int(value)
-                elif field_type in ["FloatField", "DecimalField"]:
-                    value = float(value)
-                elif field_type == "BooleanField":
-                    value = value.lower() in ["true", "1"]
-                else:
-                    value = str(value)  # Default to string for text fields
+                for field, value in fields.items():
+                    if hasattr(obj, field):
+                        field_type = obj._meta.get_field(field).get_internal_type()
+                        if field_type in ["IntegerField", "PositiveIntegerField"]:
+                            value = int(float(value or 0))
+                        elif field_type in ["FloatField", "DecimalField"]:
+                            value = float(value or 0)
+                        elif field_type == "BooleanField":
+                            value = value.lower() in ["true", "1"]
+                        else:
+                            value = str(value) if value is not None else ""
 
-                setattr(obj, field, value)
-                obj.save(update_fields=[field])  # Save only the updated field
+                        if field == 'discount':
+                            discount = value
+                            list_price = float(obj.list_price or 0)
+                            sales_price = max(list_price - (list_price * discount / 100), 0)
+                            buying_price = float(obj.buying_price or 0)
+                            sales_margin = int((sales_price - buying_price) / sales_price * 100) if sales_price > 0 else 0
+                            obj.discount = discount  # Fixed typo here
+                            obj.sales_price = sales_price
+                            obj.sales_margin = sales_margin
+                            update_fields.extend(['discount', 'sales_price', 'sales_margin'])
+                        elif field == 'buying_price':
+                            buying_price = value
+                            list_price = float(obj.list_price or 0)
+                            discount = float(obj.discount or 0)
+                            sales_price = max(list_price - (list_price * discount / 100), 0)
+                            sales_margin = int((sales_price - buying_price) / sales_price * 100) if sales_price > 0 else 0
+                            obj.buying_price = buying_price
+                            obj.sales_price = sales_price
+                            obj.sales_margin = sales_margin
+                            update_fields.extend(['buying_price', 'sales_price', 'sales_margin'])
+                        else:
+                            setattr(obj, field, value)
+                            update_fields.append(field)
 
-                return JsonResponse({"status": "success", "updated_value": value})
+                obj.save(update_fields=update_fields)
+                updated_values[row_id] = {
+                    'discount': str(obj.discount),
+                    'sales_price': str(obj.sales_price),
+                    'sales_margin': str(obj.sales_margin),
+                    'buying_price': str(obj.buying_price)
+                }
 
-            return JsonResponse({"status": "error", "message": "Invalid field"}, status=400)
-
+            return JsonResponse({
+                "status": "success",
+                "message": "Fields updated successfully",
+                "updated_values": updated_values
+            })
+        except Totalsolutions.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Item not found"}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON data"}, status=400)
         except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+            return JsonResponse({"status": "error", "message": f"Server error: {str(e)}"}, status=500)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
-    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
 
 def boq(request):
     return render(request, 'boq.html', {})
 
 
-
 def generate_token():
     return secrets.token_urlsafe()
+
 
 def view_with_token(request):
     token = generate_token()
     request.session['access_token'] = token
     return render(request, 'login.html', {'token': token})
+
 
 def validate_token(request):
     token = request.GET.get('token')
@@ -327,5 +394,3 @@ def validate_token(request):
     if token != session_token:
         return HttpResponseForbidden("Invalid access.")
     return render(request, 'login.html')
-
-

@@ -19,6 +19,8 @@ path('login/', login_view, name='login'),
  path('generate-token' , generate_token, name='generate_token'),
  path('view-with-token' , view_with_token , name= 'view_with_token'),
  path('validate-token' , validate_token , name='validate_token'),
+ path('update-field/', update_field, name='update_field'),
+ 
 
  
 ]

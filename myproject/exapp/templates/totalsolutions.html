@@ -3,659 +3,884 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Total Solution editied </title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Modern Inventory Dashboard</title>
+    
+    <!-- Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
     {% load static %}
     <link rel="stylesheet" href="{% static 'style.css' %}">
-    
+
     <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #6c757d;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --light: #f9fbfc;
+            --dark: #2c3e50;
+            --table-hover: #f5f7fa;
+        }
+
         body {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            font-family: 'Mulish', sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #eef2f7 0%, #d9e2ef 100%);
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 100%;
-            max-width: 1400px; 
-            margin: 20px auto;
             padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
         }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
         .header {
+            padding: 25px;
+            border-bottom: 1px solid #eef2f7;
+            background: #fff;
             display: flex;
-            justify-content: flex-start;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
         }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 350px;
+        }
+
         .search-bar {
-            padding: 8px;
-            width: 150px;  /* Adjusted width */
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            margin-right: 20px;
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            border: 1px solid #dfe6ef;
+            border-radius: 10px;
+            background: #fff;
+            transition: all 0.3s ease;
         }
-        .dropdown {
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            margin-right: 20px;
+
+        .search-bar:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+            outline: none;
         }
-        .upload-btn {
-            padding: 8px 16px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+        }
+
+        .modern-select {
+            padding: 12px 40px 12px 20px;
+            border: 1px solid #dfe6ef;
+            border-radius: 10px;
+            background: #fff;
+            appearance: none;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .edit-btn {
-            color: #16ec40;
+
+        .modern-select:hover, .modern-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
         }
-        .delete-btn {
-            color: rgb(240, 24, 24);
+
+        .btn-modern {
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
         }
+
+        .btn-modern:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         .table-container {
+            padding: 25px;
             overflow-x: auto;
         }
-        table {
+
+        .modern-table {
             width: 100%;
-            max-width: 1400px;
-            border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 20px;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            background: #fff;
+            border-radius: 12px;
         }
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            /* font-size: 1.1rem; */
-        }
-        th {
-            background-color: #3498db;
+
+        .modern-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, #357abd 100%);
             color: white;
+            padding: 15px 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        .custom-space {
-            margin-left: 20px; /* Adjust as needed */
+
+        .modern-table th:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
         }
 
+        .modern-table th:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
 
-        .small-input {
-    width: 100px;
-    height: 30px;
-    padding: 5px; /* Optional: Adjust padding for better appearance */
-    font-size: 14px; /* Optional: Adjust font size */
-}
+        .modern-table td {
+            padding: 15px 20px;
+            background: #fff;
+            border: none;
+            vertical-align: middle;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
 
-.message-box {
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    font-size: 14px;
-    display: none; /* Initially hidden */
-    transition: opacity 0.3s ease;
-}
-.message-box.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-.message-box.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
+        .modern-table tr {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
 
-.custom-blue-btn {
-    background-color: #3498db;
-    border-color: #3498db;
-    color: white;
-}
-.custom-blue-btn:hover {
-    background-color: #2980b9; /* Slightly darker shade on hover */
-    border-color: #2980b9;
-}
+        .modern-table tbody tr:hover {
+            background: var(--table-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+        }
 
+        .modern-table td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
 
+        .modern-table td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
 
+        .action-btn {
+            padding: 8px;
+            margin: 0 4px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid #dfe6ef;
+        }
+
+        .modal-modern .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: #fff;
+        }
+
+        .modal-modern .modal-header {
+            border-bottom: none;
+            padding: 25px 25px 0;
+        }
+
+        .form-control-modern {
+            border-radius: 10px;
+            border: 1px solid #dfe6ef;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .form-control-modern:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+        }
+
+        .editable-field {
+            padding: 6px 20px 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9fbfc;
+            position: relative;
+            display: inline-block;
+        }
+
+        .editable-field:hover {
+            background: #eef2f7;
+        }
+
+        .editable-field:focus {
+            background: white;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+            outline: none;
+        }
+
+        .editable-field[data-field="discount"]::after,
+        .editable-field[data-field="sales_margin"]::after {
+            content: '%';
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .search-loading {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--primary);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translateY(-50%) rotate(0deg); }
+            100% { transform: translateY(-50%) rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="dashboard-container">
         <div class="header">
-            <a href="{% url 'exapp:home' %}" class="material-icons mr-3" style="color: #3498db;">
-                <i class="fas fa-home"></i> home
+            <a href="{% url 'exapp:home' %}" class="btn btn-modern" title="Home">
+                <i class="mdi mdi-home" style="font-size: 26px; color: var(--primary);"></i>
             </a>
-            
-            <!-- Search bar and Sorting dropdown -->
-            <input type="text" class="search-bar" placeholder="Search..." value="{{ search_query }}">
 
+            <div class="search-container">
+                <input type="text" class="search-bar form-control-modern" placeholder="Search items..." value="{{ search_query }}">
+                <i class="mdi mdi-magnify search-icon" style="font-size: 20px;"></i>
+                <div class="search-loading"></div>
+            </div>
 
-            
-            <!-- Dropdown Trigger with Arrow -->
-             <div>
-            <select class="dropdown" name="category" id="categoryDropdown">
+            <select class="modern-select" name="category" id="categoryDropdown">
                 <option value="all" {% if category_filter == 'all' %}selected{% endif %}>All Categories</option>
                 <option value="hardware" {% if category_filter == 'hardware' %}selected{% endif %}>Hardware</option>
                 <option value="software" {% if category_filter == 'software' %}selected{% endif %}>Software</option>
                 <option value="service" {% if category_filter == 'service' %}selected{% endif %}>Service</option>
             </select>
-            </div>
 
-            <a class="btn btn-success ml-2" href="#" data-toggle="modal" data-target="#addItemModal">Add Item</a>
+            <button class="btn btn-modern btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                <i class="mdi mdi-plus me-1"></i>Add Item
+            </button>
 
-            <a class="btn custom-blue-btn ml-3 custom-space" data-toggle="modal" data-target="#uploadModal">Upload</a>
+            <button class="btn btn-modern btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <i class="mdi mdi-upload me-1"></i>Upload
+            </button>
 
-            <a class="btn btn-danger ml-3" data-toggle="modal" data-target="#deleteAllModal">Delete All</a>
-        
-
-
-           
+            <button class="btn btn-modern btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                <i class="mdi mdi-delete me-1"></i>Delete All
+            </button>
         </div>
 
-
-        <div id="uploadModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+        <!-- Upload Modal -->
+        <div class="modal modal-modern fade" id="uploadModal">
+            <div class="modal-dialog">
                 <div class="modal-content">
                     <form method="POST" action="{% url 'exapp:upload' %}" enctype="multipart/form-data" id="uploadForm">
                         {% csrf_token %}
                         <div class="modal-header">
-                            <h4 class="modal-title" id="uploadModalLabel">Upload File</h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                            <h4 class="modal-title">Upload File</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label for="file">Choose File</label>
-                                <input type="file" class="form-control" id="file" name="file" required accept=".csv,.xlsx,.xls">
-                                <small class="form-text text-muted">Accepted file types: .csv, .xlsx, .xls</small>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label">Choose File</label>
+                                <input type="file" class="form-control form-control-modern" id="file" name="file" required accept=".csv,.xlsx,.xls">
+                                <small class="text-muted">Accepted: .csv, .xlsx, .xls</small>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Upload</button>
+                        <div class="modal-footer border-0 p-4">
+                            <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-modern btn-primary">Upload</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        
-        {% if messages %}
-            <div class="messages" aria-live="polite" aria-atomic="true">
-                {% for message in messages %}
-                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        
-        
 
-        
-
-
-<!-- Modal for Adding Item -->
-<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addItemModalLabel">Add New Item</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="POST" action="{% url 'exapp:additem' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="application">Applications</label>
-                        <input type="text" class="form-control" id="application" name="application" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <input type="text" class="form-control" id="category" name="category" required>
-                        {% for category in categories %}
-                    <option value="{{ category.id }}">{{ category.name }}</option>
-                        {% endfor %}
-                    </div>
-                    <div class="form-group">
-                        <label for="product_name">Product Name</label>
-                        <input type="text" class="form-control" id="product_name" name="product_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="make">Make</label>
-                        <input type="text" class="form-control" id="make" name="make" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="model">Model</label>
-                        <input type="text" class="form-control" id="model" name="model" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="specification">Specification</label>
-                        <input type="text" class="form-control" id="specification" name="specification" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="uom">UOM</label>
-                        <input type="text" class="form-control" id="uom" name="uom" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="buying_price">Buying Price</label>
-                        <input type="number" class="form-control" id="buying_price" name="buying_price" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="vendor">Vendor</label>
-                        <input type="text" class="form-control" id="vendor" name="vendor" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="quotation_received_month">Quotation Received Month</label>
-                        <input type="text" class="form-control" id="quotation_received_month"  name="quotation_received_month" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lead_time">Lead Time</label>
-                        <input type="text" class="form-control" id="lead_time" name="lead_time" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="remarks">Remarks</label>
-                        <input type="text" class="form-control" id="remarks" name="remarks" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="list_price">List Price</label>
-                        <input type="number" class="form-control" id="list_price" name="list_price" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="discount">Discount</label>
-                        <input type="number" class="form-control" id="discount" name="discount" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sales_price">Sales Price</label>
-                        <input type="number" class="form-control" id="sales_price" name="sales_price" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sales_margin">Sales Margin</label>
-                        <input type="number" class="form-control" id="sales_margin" name="sales_margin" required>
-                    </div>
+        <!-- Add Item Modal -->
+        <div class="modal modal-modern fade" id="addItemModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form method="POST" action="{% url 'exapp:additem' %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add New Item</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Applications</label>
+                                    <input type="text" class="form-control form-control-modern" name="application" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Category</label>
+                                    <input type="text" class="form-control form-control-modern" name="category" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Product Name</label>
+                                    <input type="text" class="form-control form-control-modern" name="product_name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Make</label>
+                                    <input type="text" class="form-control form-control-modern" name="make" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Model</label>
+                                    <input type="text" class="form-control form-control-modern" name="model" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Specification</label>
+                                    <input type="text" class="form-control form-control-modern" name="specification" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">UOM</label>
+                                    <input type="text" class="form-control form-control-modern" name="uom" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Buying Price</label>
+                                    <input type="number" class="form-control form-control-modern" name="buying_price" required step="1" min="0">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Vendor</label>
+                                    <input type="text" class="form-control form-control-modern" name="vendor" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Quotation Received Month</label>
+                                    <input type="text" class="form-control form-control-modern" name="quotation_received_month" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Lead Time</label>
+                                    <input type="text" class="form-control form-control-modern" name="lead_time" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Remarks</label>
+                                    <input type="text" class="form-control form-control-modern" name="remarks">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">List Price</label>
+                                    <input type="number" class="form-control form-control-modern" name="list_price" required step="1" min="0">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Discount (%)</label>
+                                    <input type="number" class="form-control form-control-modern" name="discount" required step="1" min="0" max="100">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Sales Price</label>
+                                    <input type="number" class="form-control form-control-modern" name="sales_price" required step="1" min="0">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Sales Margin (%)</label>
+                                    <input type="number" class="form-control form-control-modern" name="sales_margin" required step="1" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 p-4">
+                            <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-modern btn-primary">Save Item</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Item</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
-</div>
 
-        
-
-<div class="table-container">
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th class="col-sl">SL No</th>
-                <th class="col-app">Applications</th>
-                <th class="col-cat">Category</th>
-                <th class="col-prod">Product Name</th>
-                <th class="col-make">Make</th>
-                <th class="col-model">Model</th>
-                <th class="col-spec">Specification</th>
-                <th class="col-uom">UOM</th>
-                <th class="col-price">Buying Price</th>
-                <th class="col-vendor">Vendor</th>
-                <th class="col-date">Quotation Date</th>
-                <th class="col-time">Lead Time</th>
-                <th class="col-remarks">Remarks</th>
-                <th class="col-price">List Price</th>
-                <th class="col-price">Discount</th>
-                <th class="col-price">Sales Price</th>
-                <th class="col-price">Sales Margin</th>
-                <th class="col-actions">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for obj in objs %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ obj.application }}</td>
-                <td>{{ obj.category }}</td>
-                <td>{{ obj.product_name }}</td>
-                <td>{{ obj.make }}</td>
-                <td>{{ obj.model }}</td>
-                <td>{{ obj.specification }}</td>
-                <td>{{ obj.uom }}</td>
-                <td>
-                    <div class="buying-price-input"
-                         data-row-id="{{ obj.id }}"
-                         data-field="buying_price"
-                         contenteditable="true"
-                         onblur="updateField(this)">
-                        {{ obj.buying_price }}
-                    </div>
-                </td>
-                <td>{{ obj.vendor }}</td>
-                <td>{{ obj.quotation_received_month }}</td>
-                <td>{{ obj.lead_time }}</td>
-                <td>{{ obj.remarks }}</td>
-                <td>{{ obj.list_price }}</td>
-                <td>
-                    <div class="discount-input"
-                         data-row-id="{{ obj.id }}"
-                         data-field="discount"
-                         contenteditable="true"
-                         onblur="updateField(this)">
-                        {{ obj.discount }}
-                    </div>
-                </td>
-                <td>
-                    <div class="sales-price-input"
-                         data-row-id="{{ obj.id }}"
-                         data-field="sales_price"
-                         contenteditable="true"
-                         onblur="updateField(this)">
-                        {{ obj.sales_price }}
-                    </div>
-                </td>
-                <td>
-                    <div class="sales-margin-input"
-                         data-row-id="{{ obj.id }}"
-                         data-field="sales_margin"
-                         contenteditable="true"
-                         onblur="updateField(this)">
-                        {{ obj.sales_margin }}
-                    </div>
-                </td>
-                <td>
-                    <a href="#editTotalsolutionsModal-{{ forloop.counter }}" 
-                       class="btn btn-sm btn-outline-success edit-btn" 
-                       data-toggle="modal">
-                        <i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
-                    </a>
-                    <a href="#deleteTotalsolutionsModal-{{ forloop.counter }}" 
-                       class="btn btn-sm btn-outline-danger delete-btn" 
-                       data-toggle="modal">
-                        <i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
-                    </a>
-                            <!-- these is Edit model -->
-
-                            <div id="editTotalsolutionsModal-{{forloop.counter}}" class="modal fade">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form method="POST" action="{% url 'exapp:edit' obj.id %}">
-                                            {% csrf_token %}
-                                            <div class="modal-header">
-                                                <h4 class="modal-title">Edit Item</h4>
-                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="form-group">
-                                                    <label for="application">Application</label>
-                                                    <input type="text" class="form-control" id="application" name="application" value="{{ obj.application }}" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="category">Category</label>
-                                                    <input type="text" class="form-control" id="category" name="category" value="{{ obj.category }}" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="product_name">Product Name</label>
-                                                    <input type="text" class="form-control" id="product_name" name="product_name" value="{{ obj.product_name }}" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="make">Make</label>
-                                                    <input type="text" class="form-control" id="make" name="make" value="{{ obj.make }}" required>
-                                                </div>
-                                                
-                                                <!-- Model -->
-                                                <div class="form-group">
-                                                    <label for="model">Model</label>
-                                                    <input type="text" class="form-control" id="model" name="model" value="{{ obj.model }}" required>
-                                                </div>
-                                                
-                                                <!-- Specification -->
-                                                <div class="form-group">
-                                                    <label for="specification">Specification</label>
-                                                    <input type="text" class="form-control" id="specification" name="specification" value="{{ obj.specification }}" required>
-                                                </div>
-                                                
-                                                <!-- UOM -->
-                                                <div class="form-group">
-                                                    <label for="uom">UOM</label>
-                                                    <input type="text" class="form-control" id="uom" name="uom" value="{{ obj.uom }}" required>
-                                                </div>
-                                                
-                                                <!-- Buying Price -->
-                                                <div class="form-group">
-                                                    <label for="buying_price">Buying Price</label>
-                                                    <input type="number" class="form-control" id="buying_price" name="buying_price" value="{{ obj.buying_price }}" required>
-                                                </div>
-                                                
-                                                <!-- Vendor -->
-                                                <div class="form-group">
-                                                    <label for="vendor">Vendor</label>
-                                                    <input type="text" class="form-control" id="vendor" name="vendor" value="{{ obj.vendor }}" required>
-                                                </div>
-                                                
-                                                <!-- Quotation Received Month -->
-                                                <div class="form-group">
-                                                    <label for="quotation_received_month">Quotation Received Month</label>
-                                                    <input type="text" class="form-control" id="quotation_received_month" name="quotation_received_month" value="{{ obj.quotation_received_month }}" required>
-                                                </div>
-                                                
-                                                <!-- Lead Time -->
-                                                <div class="form-group">
-                                                    <label for="lead_time">Lead Time</label>
-                                                    <input type="text" class="form-control" id="lead_time" name="lead_time" value="{{ obj.lead_time }}" required>
-                                                </div>
-                                                
-                                                <!-- Remarks -->
-                                                <div class="form-group">
-                                                    <label for="remarks">Remarks</label>
-                                                    <input type="text" class="form-control" id="remarks" name="remarks" value="{{ obj.remarks }}">
-                                                </div>
-                                                
-                                                <!-- List Price -->
-                                                <div class="form-group">
-                                                    <label for="list_price">List Price</label>
-                                                    <input type="number" class="form-control" id="list_price" name="list_price" value="{{ obj.list_price }}" required>
-                                                </div>
-                                                
-                                                <!-- Discount -->
-                                                <div class="form-group">
-                                                    <label for="discount">Discount (%)</label>
-                                                    <input type="number" class="form-control" id="discount" name="discount" value="{{ obj.discount }}" required>
-                                                </div>
-                                                
-                                                <!-- Sales Price -->
-                                                <div class="form-group">
-                                                    <label for="sales_price">Sales Price</label>
-                                                    <input type="number" class="form-control" id="sales_price" name="sales_price" value="{{ obj.sales_price }}" required>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="sales_margin">Sales Margin (%)</label>
-                                                    <input type="number" class="form-control" id="sales_margin" name="sales_margin" value="{{ obj.sales_margin }}" required>
-                                                </div>
-                                                <!-- Add other fields similarly -->
-                                            </div>
-                                            <div class="modal-footer">
-                                                <input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cancel">
-                                                <input type="submit" class="btn btn-primary" value="Save Changes">
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+        <!-- Main Table -->
+        <div class="table-container">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>SL No</th>
+                        <th>Applications</th>
+                        <th>Category</th>
+                        <th>Product Name</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Specification</th>
+                        <th>UOM</th>
+                        <th>Buying Price</th>
+                        <th>Vendor</th>
+                        <th>Quotation Date</th>
+                        <th>Lead Time</th>
+                        <th>Remarks</th>
+                        <th>List Price</th>
+                        <th>Discount</th>
+                        <th>Sales Price</th>
+                        <th>Sales Margin</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    {% for obj in objs %}
+                    <tr class="fade-in">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ obj.application }}</td>
+                        <td>{{ obj.category }}</td>
+                        <td>{{ obj.product_name }}</td>
+                        <td>{{ obj.make }}</td>
+                        <td>{{ obj.model }}</td>
+                        <td>{{ obj.specification }}</td>
+                        <td>{{ obj.uom }}</td>
+                        <td>
+                            <div class="editable-field" 
+                                 data-row-id="{{ obj.id }}"
+                                 data-field="buying_price"
+                                 contenteditable="true"
+                                 onkeydown="handleKeyDown(event, this)">
+                                {{ obj.buying_price }}
                             </div>
-
-
-
-                            <div id="deleteAllModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <form method="POST" action="{% url 'exapp:delete_all' %}">
-                                            {% csrf_token %}
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="deleteAllModalLabel">Delete All Items</h4>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Are you sure you want to delete all items? This action cannot be undone.</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-danger">Delete All</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                        </td>
+                        <td>{{ obj.vendor }}</td>
+                        <td>{{ obj.quotation_received_month }}</td>
+                        <td>{{ obj.lead_time }}</td>
+                        <td>{{ obj.remarks }}</td>
+                        <td>{{ obj.list_price }}</td>
+                        <td>
+                            <div class="editable-field" 
+                                 data-row-id="{{ obj.id }}"
+                                 data-field="discount"
+                                 contenteditable="true"
+                                 onkeydown="handleKeyDown(event, this)">
+                                {{ obj.discount }}
                             </div>
-                    
-
-
-                            
-
-
-                           
-                            <!-- thse is delete model -->
-                            <div id="deleteTotalsolutionsModal-{{forloop.counter}}" class="modal fade">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form method="POST" action="{% url 'exapp:delete' obj.id %}">
-                                            {% csrf_token %}
-                                        <form>
-                                            <div class="modal-header">						
-                                                <h4 class="modal-title">Delete Item</h4>
-                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            </div>
-                                            <div class="modal-body">					
-                                                <p>Are you sure you want to delete these Records?</p>
-                                                <p class="text-warning"><small>Are you want to delete {{obj.product_name}} </small></p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                                                <input type="submit" class="btn btn-danger" value="Delete">
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                        </td>
+                        <td>
+                            <div class="editable-field" 
+                                 data-row-id="{{ obj.id }}"
+                                 data-field="sales_price"
+                                 contenteditable="true"
+                                 onkeydown="handleKeyDown(event, this)">
+                                {{ obj.sales_price }}
                             </div>
-                          
+                        </td>
+                        <td>
+                            <div class="editable-field" 
+                                 data-row-id="{{ obj.id }}"
+                                 data-field="sales_margin"
+                                 contenteditable="true"
+                                 onkeydown="handleKeyDown(event, this)">
+                                {{ obj.sales_margin }}
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn action-btn btn-outline-success" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editTotalsolutionsModal-{{ forloop.counter }}">
+                                <i class="mdi mdi-pencil"></i>
+                            </button>
+                            <button class="btn action-btn btn-outline-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deleteTotalsolutionsModal-{{ forloop.counter }}">
+                                <i class="mdi mdi-delete"></i>
+                            </button>
                         </td>
                     </tr>
-                  {% endfor %}
+
+                    <!-- Edit Modal -->
+                    <div class="modal modal-modern fade" id="editTotalsolutionsModal-{{ forloop.counter }}">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <form method="POST" action="{% url 'exapp:edit' obj.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Edit Item</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Application</label>
+                                                <input type="text" class="form-control form-control-modern" name="application" value="{{ obj.application }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Category</label>
+                                                <input type="text" class="form-control form-control-modern" name="category" value="{{ obj.category }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Product Name</label>
+                                                <input type="text" class="form-control form-control-modern" name="product_name" value="{{ obj.product_name }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Make</label>
+                                                <input type="text" class="form-control form-control-modern" name="make" value="{{ obj.make }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Model</label>
+                                                <input type="text" class="form-control form-control-modern" name="model" value="{{ obj.model }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Specification</label>
+                                                <input type="text" class="form-control form-control-modern" name="specification" value="{{ obj.specification }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">UOM</label>
+                                                <input type="text" class="form-control form-control-modern" name="uom" value="{{ obj.uom }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Buying Price</label>
+                                                <input type="number" class="form-control form-control-modern" name="buying_price" value="{{ obj.buying_price }}" required step="1" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Vendor</label>
+                                                <input type="text" class="form-control form-control-modern" name="vendor" value="{{ obj.vendor }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Quotation Received Month</label>
+                                                <input type="text" class="form-control form-control-modern" name="quotation_received_month" value="{{ obj.quotation_received_month }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Lead Time</label>
+                                                <input type="text" class="form-control form-control-modern" name="lead_time" value="{{ obj.lead_time }}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Remarks</label>
+                                                <input type="text" class="form-control form-control-modern" name="remarks" value="{{ obj.remarks }}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">List Price</label>
+                                                <input type="number" class="form-control form-control-modern" name="list_price" value="{{ obj.list_price }}" required step="1" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Discount (%)</label>
+                                                <input type="number" class="form-control form-control-modern" name="discount" value="{{ obj.discount }}" required step="1" min="0" max="100">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Sales Price</label>
+                                                <input type="number" class="form-control form-control-modern" name="sales_price" value="{{ obj.sales_price }}" required step="1" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Sales Margin (%)</label>
+                                                <input type="number" class="form-control form-control-modern" name="sales_margin" value="{{ obj.sales_margin }}" required step="1" min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0 p-4">
+                                        <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-modern btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Modal -->
+                    <div class="modal modal-modern fade" id="deleteTotalsolutionsModal-{{ forloop.counter }}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="{% url 'exapp:delete' obj.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Delete Item</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <p>Are you sure you want to delete this item?</p>
+                                        <p class="text-muted"><small>{{ obj.product_name }}</small></p>
+                                    </div>
+                                    <div class="modal-footer border-0 p-4">
+                                        <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-modern btn-danger">Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <!-- Delete All Modal -->
+        <div class="modal modal-modern fade" id="deleteAllModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{% url 'exapp:delete_all' %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h4 class="modal-title">Delete All Items</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <p>Are you sure you want to delete all items? This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer border-0 p-4">
+                            <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-modern btn-danger">Delete All</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <!-- Full jQuery version -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        
-        document.querySelector('.dropdown').addEventListener('change', function() {
-        let selectedCategory = this.value; // Get the selected category value
-        
-        // You can either filter the table data here or send it to the server for backend filtering
-        
-        filterDataByCategory(selectedCategory);
-    });
-
-    function filterDataByCategory(category) {
-        // This can be a client-side table filter or send an AJAX request to the backend.
-        // Here we will reload the page with the selected category as a URL parameter to trigger backend filtering
-
-        window.location.href = "{% url 'exapp:totalsolutions' %}?category=" + category;  // Make sure to use your actual view name in the URL
-    }
-
-    let debounceTimer;
-    document.querySelector('.search-bar').addEventListener('input', function() {
-        let searchQuery = this.value; // Get the search query value
-
-        clearTimeout(debounceTimer);
-
-        debounceTimer = setTimeout(function() {
-        // Trigger backend filtering by updating the URL with the search query
-        filterDataBySearch(searchQuery);
-    }, 500);  // Adjust the delay (in ms) if necessary
-
-
-        // Trigger backend filtering by updating the URL with the search query
-        filterDataBySearch(searchQuery);
-    });
-
-    function filterDataBySearch(query) {
-        // This reloads the page with the search query as a URL parameter
-        window.location.href = "{% url 'exapp:totalsolutions' %}?search=" + query + "&category=" + getSelectedCategory(); 
-    }
-
-    // Helper function to get the selected category
-    function getSelectedCategory() {
-        return document.querySelector('.dropdown').value;
-    }
-
-    document.getElementById('uploadForm').addEventListener('submit', function(event) {
-    var fileInput = document.getElementById('file');
-    if (fileInput.files.length === 0) {
-        event.preventDefault();
-        alert('Please select a file to upload.');
-    }
-});
-
-function updateField(element) {
-    const rowId = element.dataset.rowId;
-    const field = element.dataset.field;
-    const value = element.innerText.trim();
-
-    if (!rowId || !field) {
-        console.error("Invalid data attributes.");
-        return;
-    }
-
-    fetch("/update-field/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
-        },
-        body: JSON.stringify({
-            id: rowId,
-            field: field,
-            value: value
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === "success") {
-            console.log("Field updated successfully:", data.updated_value);
-        } else {
-            console.error("Error updating field:", data.message);
+        // Utility function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
-    })
-    .catch(error => console.error("Server error:", error));
-}
 
+        // Search functionality with AJAX
+        let searchTimeout;
+        $('.search-bar').on('input', function() {
+            clearTimeout(searchTimeout);
+            const query = $(this).val().trim();
+            const $loading = $('.search-loading');
+            $loading.show();
 
+            searchTimeout = setTimeout(() => {
+                $.ajax({
+                    url: '{% url "exapp:totalsolutions" %}',
+                    method: 'GET',
+                    data: {
+                        search: query,
+                        category: getSelectedCategory()
+                    },
+                    success: function(response) {
+                        const $tableBody = $('#table-body');
+                        $tableBody.empty();
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(response, 'text/html');
+                        const newRows = $(doc).find('#table-body').html();
+                        $tableBody.html(newRows);
 
+                        attachEditableFieldListeners();
+                        $loading.hide();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Search error:', error);
+                        $loading.hide();
+                        alert('Failed to load search results. Please try again.');
+                    }
+                });
+            }, 300);
+        });
+
+        // Category filter with AJAX
+        $('.modern-select').on('change', function() {
+            const category = this.value;
+            const query = $('.search-bar').val().trim();
+            const $loading = $('.search-loading');
+            $loading.show();
+
+            $.ajax({
+                url: '{% url "exapp:totalsolutions" %}',
+                method: 'GET',
+                data: {
+                    search: query,
+                    category: category
+                },
+                success: function(response) {
+                    const $tableBody = $('#table-body');
+                    $tableBody.empty();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(response, 'text/html');
+                    const newRows = $(doc).find('#table-body').html();
+                    $tableBody.html(newRows);
+
+                    attachEditableFieldListeners();
+                    $loading.hide();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Category filter error:', error);
+                    $loading.hide();
+                    alert('Failed to load filtered results. Please try again.');
+                }
+            });
+        });
+
+        function getSelectedCategory() {
+            return $('.modern-select').val();
+        }
+
+        // File upload validation
+        $('#uploadForm').on('submit', function(e) {
+            if (!$('#file').val()) {
+                e.preventDefault();
+                $('#file').addClass('border-danger');
+                setTimeout(() => $('#file').removeClass('border-danger'), 2000);
+                alert('Please select a file to upload.');
+            }
+        });
+
+        // Update multiple fields across rows via AJAX
+        function updateFields(updates) {
+            const $editableFields = $('.editable-field');
+            $editableFields.css('opacity', '0.5');
+
+            $.ajax({
+                url: '{% url "exapp:update_field" %}',
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({ updates: updates }),
+                success: function(response) {
+                    $editableFields.css('opacity', '1');
+                    if (response.status === 'success') {
+                        Object.keys(response.updated_values).forEach(rowId => {
+                            const fields = response.updated_values[rowId];
+                            Object.keys(fields).forEach(field => {
+                                const $field = $(`.editable-field[data-row-id="${rowId}"][data-field="${field}"]`);
+                                $field.text(fields[field]);
+                                $field.addClass('text-success bg-success bg-opacity-10');
+                                setTimeout(() => $field.removeClass('text-success bg-success bg-opacity-10'), 1500);
+                            });
+                            // Update the corresponding modal with new values
+                            updateModalValues(rowId, fields);
+                        });
+                    } else {
+                        $editableFields.addClass('text-danger bg-danger bg-opacity-10');
+                        setTimeout(() => $editableFields.removeClass('text-danger bg-danger bg-opacity-10'), 1500);
+                        alert(response.message || 'Update failed');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $editableFields.css('opacity', '1');
+                    console.error('Server error:', error);
+                    $editableFields.addClass('text-danger bg-danger bg-opacity-10');
+                    setTimeout(() => $editableFields.removeClass('text-danger bg-danger bg-opacity-10'), 1500);
+                    alert('Failed to update fields. Please try again.');
+                }
+            });
+        }
+
+        // Function to update modal input fields with new values
+        function updateModalValues(rowId, updatedFields) {
+            const $modal = $(`#editTotalsolutionsModal-${getModalIndex(rowId)}`);
+            if ($modal.length) {
+                Object.keys(updatedFields).forEach(field => {
+                    const $input = $modal.find(`input[name="${field}"]`);
+                    if ($input.length) {
+                        $input.val(updatedFields[field]);
+                    }
+                });
+            }
+        }
+
+        // Helper function to get the modal index (SL No) from rowId
+        function getModalIndex(rowId) {
+            const $row = $(`.editable-field[data-row-id="${rowId}"]`).closest('tr');
+            return $row.find('td:first-child').text(); // SL No
+        }
+
+        // Handle Enter key press for editable fields
+        function handleKeyDown(event, element) {
+            if (event.which === 13) { // Enter key
+                event.preventDefault();
+                const $element = $(element);
+                const rowId = $element.data('row-id');
+                const field = $element.data('field');
+                let value = $element.text().trim().replace('%', ''); // Remove % if present
+                const slNo = parseInt($element.closest('tr').find('td:first-child').text()); // Get SL No
+
+                // Validate input
+                if (!value || isNaN(value)) {
+                    alert('Please enter a valid number.');
+                    $element.text($element.data('original-value') || ''); // Revert to original value
+                    return;
+                }
+
+                value = parseInt(value); // Convert to integer
+
+                // Store original value for potential revert
+                if (!$element.data('original-value')) {
+                    $element.data('original-value', $element.text().trim().replace('%', ''));
+                }
+
+                const updates = {};
+                if (field === 'discount' && slNo === 1) {
+                    // Apply discount to all rows if edited in the first row
+                    $('#table-body tr').each(function() {
+                        const $row = $(this);
+                        const rowId = $row.find('.editable-field[data-field="discount"]').data('row-id');
+                        updates[rowId] = { discount: value };
+                    });
+                } else {
+                    // Update only the current row
+                    updates[rowId] = { [field]: value };
+                }
+
+                updateFields(updates);
+            }
+        }
+
+        // Attach listeners to editable fields
+        function attachEditableFieldListeners() {
+            $('.editable-field').off('keydown').on('keydown', function(event) {
+                handleKeyDown(event, this);
+            });
+        }
+
+        // Initial attachment of listeners
+        $(document).ready(function() {
+            attachEditableFieldListeners();
+
+            // Ensure modal reflects latest values when shown
+            $('.action-btn.btn-outline-success').on('click', function() {
+                const $row = $(this).closest('tr');
+                const rowId = $row.find('.editable-field').first().data('row-id');
+                const modalIndex = $row.find('td:first-child').text();
+                const $modal = $(`#editTotalsolutionsModal-${modalIndex}`);
+
+                // Update editable fields in the modal
+                $modal.find('input[name="buying_price"]').val($row.find('.editable-field[data-field="buying_price"]').text());
+                $modal.find('input[name="discount"]').val($row.find('.editable-field[data-field="discount"]').text());
+                $modal.find('input[name="sales_price"]').val($row.find('.editable-field[data-field="sales_price"]').text());
+                $modal.find('input[name="sales_margin"]').val($row.find('.editable-field[data-field="sales_margin"]').text());
+            });
+        });
+
+        // Smooth scroll for table
+        $('.table-container').on('wheel', function(e) {
+            e.preventDefault();
+            this.scrollLeft += e.originalEvent.deltaY * 0.5;
+        });
     </script>
 
     {% block content %}{% endblock %}
