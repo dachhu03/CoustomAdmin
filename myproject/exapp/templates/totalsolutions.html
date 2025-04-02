@@ -266,6 +266,22 @@
             0% { transform: translateY(-50%) rotate(0deg); }
             100% { transform: translateY(-50%) rotate(360deg); }
         }
+
+        .product-image {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-image-cell {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .product-image-cell:hover {
+            background-color: #eef2f7;
+        }
     </style>
 </head>
 <body>
@@ -331,7 +347,7 @@
         <div class="modal modal-modern fade" id="addItemModal">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <form method="POST" action="{% url 'exapp:additem' %}">
+                    <form method="POST" action="{% url 'exapp:additem' %}" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="modal-header">
                             <h5 class="modal-title">Add New Item</h5>
@@ -352,6 +368,10 @@
                                     <input type="text" class="form-control form-control-modern" name="product_name" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
+                                    <label class="form-label">Product Image</label>
+                                    <input type="file" class="form-control form-control-modern" name="product_image" accept="image/*">
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Make</label>
                                     <input type="text" class="form-control form-control-modern" name="make" required>
                                 </div>
@@ -369,7 +389,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Buying Price</label>
-                                    <input type="number" class="form-control form-control-modern" name="buying_price" required step="1" min="0">
+                                    <input type="number" class="form-control form-control-modern" name="buying_price" required step="0.01" min="0">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Vendor</label>
@@ -377,7 +397,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Quotation Received Month</label>
-                                    <input type="text" class="form-control form-control-modern" name="quotation_received_month" required>
+                                    <input type="text" class="form-control form-control-modern" name="quotation_received_month" required placeholder="e.g., Mar 2025">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Lead Time</label>
@@ -389,19 +409,11 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">List Price</label>
-                                    <input type="number" class="form-control form-control-modern" name="list_price" required step="1" min="0">
+                                    <input type="number" class="form-control form-control-modern" name="list_price" required step="0.01" min="0">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Discount (%)</label>
                                     <input type="number" class="form-control form-control-modern" name="discount" required step="1" min="0" max="100">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Sales Price</label>
-                                    <input type="number" class="form-control form-control-modern" name="sales_price" required step="1" min="0">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Sales Margin (%)</label>
-                                    <input type="number" class="form-control form-control-modern" name="sales_margin" required step="1" min="0">
                                 </div>
                             </div>
                         </div>
@@ -424,6 +436,7 @@
                         <th>Applications</th>
                         <th>Category</th>
                         <th>Product Name</th>
+                        <th>Product Image</th>
                         <th>Make</th>
                         <th>Model</th>
                         <th>Specification</th>
@@ -444,27 +457,35 @@
                     {% for obj in objs %}
                     <tr class="fade-in">
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ obj.application }}</td>
-                        <td>{{ obj.category }}</td>
-                        <td>{{ obj.product_name }}</td>
-                        <td>{{ obj.make }}</td>
-                        <td>{{ obj.model }}</td>
-                        <td>{{ obj.specification }}</td>
-                        <td>{{ obj.uom }}</td>
+                        <td>{{ obj.application|default:'NAN' }}</td>
+                        <td>{{ obj.category|default:'NAN' }}</td>
+                        <td>{{ obj.product_name|default:'NAN' }}</td>
+                        <td class="product-image-cell" data-row-id="{{ obj.id }}">
+                            {% if obj.product_image %}
+                                <img src="{{ obj.product_image.url }}" alt="{{ obj.product_name }}" class="product-image">
+                            {% else %}
+                                <span>Click to upload</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ obj.make|default:'NAN' }}</td>
+                        <td>{{ obj.model|default:'NAN' }}</td>
+                        <td>{{ obj.specification|default:'NAN' }}</td>
+                        <td>{{ obj.uom|default:'NAN' }}</td>
                         <td>
                             <div class="editable-field" 
                                  data-row-id="{{ obj.id }}"
                                  data-field="buying_price"
                                  contenteditable="true"
-                                 onkeydown="handleKeyDown(event, this)">
-                                {{ obj.buying_price }}
+                                 onkeydown="handleKeyDown(event, this)"
+                                 {{ obj.buying_price_color }};>
+                                {{ obj.buying_price|default:'NAN' }}
                             </div>
                         </td>
-                        <td>{{ obj.vendor }}</td>
-                        <td>{{ obj.quotation_received_month }}</td>
-                        <td>{{ obj.lead_time }}</td>
-                        <td>{{ obj.remarks }}</td>
-                        <td>{{ obj.list_price }}</td>
+                        <td>{{ obj.vendor|default:'NAN' }}</td>
+                        <td>{{ obj.quotation_received_month|default:'NAN' }}</td>
+                        <td>{{ obj.lead_time|default:'NAN' }}</td>
+                        <td>{{ obj.remarks|default:'NAN' }}</td>
+                        <td>{{ obj.list_price|default:'NAN' }}</td>
                         <td>
                             <div class="editable-field" 
                                  data-row-id="{{ obj.id }}"
@@ -480,7 +501,7 @@
                                  data-field="sales_price"
                                  contenteditable="true"
                                  onkeydown="handleKeyDown(event, this)">
-                                {{ obj.sales_price }}
+                                {{ obj.sales_price|default:'NAN' }}
                             </div>
                         </td>
                         <td>
@@ -489,7 +510,7 @@
                                  data-field="sales_margin"
                                  contenteditable="true"
                                  onkeydown="handleKeyDown(event, this)">
-                                {{ obj.sales_margin }}
+                                {{ obj.sales_margin|default:'NAN' }}
                             </div>
                         </td>
                         <td>
@@ -520,67 +541,67 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Application</label>
-                                                <input type="text" class="form-control form-control-modern" name="application" value="{{ obj.application }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="application" value="{{ obj.application|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Category</label>
-                                                <input type="text" class="form-control form-control-modern" name="category" value="{{ obj.category }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="category" value="{{ obj.category|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Product Name</label>
-                                                <input type="text" class="form-control form-control-modern" name="product_name" value="{{ obj.product_name }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="product_name" value="{{ obj.product_name|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Make</label>
-                                                <input type="text" class="form-control form-control-modern" name="make" value="{{ obj.make }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="make" value="{{ obj.make|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Model</label>
-                                                <input type="text" class="form-control form-control-modern" name="model" value="{{ obj.model }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="model" value="{{ obj.model|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Specification</label>
-                                                <input type="text" class="form-control form-control-modern" name="specification" value="{{ obj.specification }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="specification" value="{{ obj.specification|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">UOM</label>
-                                                <input type="text" class="form-control form-control-modern" name="uom" value="{{ obj.uom }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="uom" value="{{ obj.uom|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Buying Price</label>
-                                                <input type="number" class="form-control form-control-modern" name="buying_price" value="{{ obj.buying_price }}" required step="1" min="0">
+                                                <input type="number" class="form-control form-control-modern buying-price-input" name="buying_price" value="{{ obj.buying_price|default:'0' }}" required step="0.01" min="0">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Vendor</label>
-                                                <input type="text" class="form-control form-control-modern" name="vendor" value="{{ obj.vendor }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="vendor" value="{{ obj.vendor|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Quotation Received Month</label>
-                                                <input type="text" class="form-control form-control-modern" name="quotation_received_month" value="{{ obj.quotation_received_month }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="quotation_received_month" value="{{ obj.quotation_received_month|default:'' }}" required placeholder="e.g., Mar 2025">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Lead Time</label>
-                                                <input type="text" class="form-control form-control-modern" name="lead_time" value="{{ obj.lead_time }}" required>
+                                                <input type="text" class="form-control form-control-modern" name="lead_time" value="{{ obj.lead_time|default:'' }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Remarks</label>
-                                                <input type="text" class="form-control form-control-modern" name="remarks" value="{{ obj.remarks }}">
+                                                <input type="text" class="form-control form-control-modern" name="remarks" value="{{ obj.remarks|default:'' }}">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">List Price</label>
-                                                <input type="number" class="form-control form-control-modern" name="list_price" value="{{ obj.list_price }}" required step="1" min="0">
+                                                <input type="number" class="form-control form-control-modern" name="list_price" value="{{ obj.list_price|default:'0' }}" required step="0.01" min="0">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Discount (%)</label>
-                                                <input type="number" class="form-control form-control-modern" name="discount" value="{{ obj.discount }}" required step="1" min="0" max="100">
+                                                <input type="number" class="form-control form-control-modern discount-input" name="discount" value="{{ obj.discount|default:'0' }}" required step="1" min="0" max="100">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Sales Price</label>
-                                                <input type="number" class="form-control form-control-modern" name="sales_price" value="{{ obj.sales_price }}" required step="1" min="0">
+                                                <input type="number" class="form-control form-control-modern sales-price-input" name="sales_price" value="{{ obj.sales_price|default:'0' }}" required step="0.01" min="0">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Sales Margin (%)</label>
-                                                <input type="number" class="form-control form-control-modern" name="sales_margin" value="{{ obj.sales_margin }}" required step="1" min="0">
+                                                <input type="number" class="form-control form-control-modern sales-margin-input" name="sales_margin" value="{{ obj.sales_margin|default:'0' }}" required step="1" min="0">
                                             </div>
                                         </div>
                                     </div>
@@ -618,6 +639,8 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <!-- Hidden File Input for Image Upload -->
+            <input type="file" id="imageUploadInput" style="display: none;" accept="image/*">
         </div>
 
         <!-- Delete All Modal -->
@@ -664,7 +687,7 @@
             return cookieValue;
         }
 
-        // Search functionality with AJAX
+        // Search functionality with AJAX using search_products
         let searchTimeout;
         $('.search-bar').on('input', function() {
             clearTimeout(searchTimeout);
@@ -674,21 +697,14 @@
 
             searchTimeout = setTimeout(() => {
                 $.ajax({
-                    url: '{% url "exapp:totalsolutions" %}',
+                    url: '{% url "exapp:search_products" %}',
                     method: 'GET',
                     data: {
                         search: query,
                         category: getSelectedCategory()
                     },
                     success: function(response) {
-                        const $tableBody = $('#table-body');
-                        $tableBody.empty();
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(response, 'text/html');
-                        const newRows = $(doc).find('#table-body').html();
-                        $tableBody.html(newRows);
-
-                        attachEditableFieldListeners();
+                        updateTable(response.products);
                         $loading.hide();
                     },
                     error: function(xhr, status, error) {
@@ -700,7 +716,7 @@
             }, 300);
         });
 
-        // Category filter with AJAX
+        // Category filter with AJAX using search_products
         $('.modern-select').on('change', function() {
             const category = this.value;
             const query = $('.search-bar').val().trim();
@@ -708,21 +724,14 @@
             $loading.show();
 
             $.ajax({
-                url: '{% url "exapp:totalsolutions" %}',
+                url: '{% url "exapp:search_products" %}',
                 method: 'GET',
                 data: {
                     search: query,
                     category: category
                 },
                 success: function(response) {
-                    const $tableBody = $('#table-body');
-                    $tableBody.empty();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(response, 'text/html');
-                    const newRows = $(doc).find('#table-body').html();
-                    $tableBody.html(newRows);
-
-                    attachEditableFieldListeners();
+                    updateTable(response.products);
                     $loading.hide();
                 },
                 error: function(xhr, status, error) {
@@ -735,6 +744,198 @@
 
         function getSelectedCategory() {
             return $('.modern-select').val();
+        }
+
+        // Function to update table dynamically
+        function updateTable(products) {
+            const $tableBody = $('#table-body');
+            $tableBody.empty();
+            products.forEach((product, index) => {
+                const baseEditUrl = '{% url "exapp:edit" 0 %}'.replace(/0\/$/, `${product.id}/`);
+                const baseDeleteUrl = '{% url "exapp:delete" 0 %}'.replace(/0\/$/, `${product.id}/`);
+                const row = `
+                    <tr class="fade-in">
+                        <td>${index + 1}</td>
+                        <td>${product.application || 'NAN'}</td>
+                        <td>${product.category || 'NAN'}</td>
+                        <td>${product.product_name || 'NAN'}</td>
+                        <td class="product-image-cell" data-row-id="${product.id}">
+                            ${product.product_image ? `<img src="${product.product_image}" alt="${product.product_name}" class="product-image">` : 'Click to upload'}
+                        </td>
+                        <td>${product.make || 'NAN'}</td>
+                        <td>${product.model || 'NAN'}</td>
+                        <td>${product.specification || 'NAN'}</td>
+                        <td>${product.uom || 'NAN'}</td>
+                        <td>
+                            <div class="editable-field" 
+                                 data-row-id="${product.id}"
+                                 data-field="buying_price"
+                                 contenteditable="true"
+                                 onkeydown="handleKeyDown(event, this)"
+                                 style="color: ${product.buying_price_color};">
+                                ${product.buying_price || 'NAN'}
+                            </div>
+                        </td>
+                        <td>${product.vendor || 'NAN'}</td>
+                        <td>${product.quotation_received_month || 'NAN'}</td>
+                        <td>${product.lead_time || 'NAN'}</td>
+                        <td>${product.remarks || 'NAN'}</td>
+                        <td>${product.list_price || 'NAN'}</td>
+                        <td>
+                            <div class="editable-field" 
+                                 data-row-id="${product.id}"
+                                 data-field="discount"
+                                 contenteditable="true"
+                                 onkeydown="handleKeyDown(event, this)">
+                                ${product.discount}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="editable-field" 
+                                 data-row-id="${product.id}"
+                                 data-field="sales_price"
+                                 contenteditable="true"
+                                 onkeydown="handleKeyDown(event, this)">
+                                ${product.sales_price || 'NAN'}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="editable-field" 
+                                 data-row-id="${product.id}"
+                                 data-field="sales_margin"
+                                 contenteditable="true"
+                                 onkeydown="handleKeyDown(event, this)">
+                                ${product.sales_margin || 'NAN'}
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn action-btn btn-outline-success" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editTotalsolutionsModal-${index + 1}">
+                                <i class="mdi mdi-pencil"></i>
+                            </button>
+                            <button class="btn action-btn btn-outline-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deleteTotalsolutionsModal-${index + 1}">
+                                <i class="mdi mdi-delete"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Edit Modal -->
+                    <div class="modal modal-modern fade" id="editTotalsolutionsModal-${index + 1}">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <form method="POST" action="${baseEditUrl}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Edit Item</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Application</label>
+                                                <input type="text" class="form-control form-control-modern" name="application" value="${product.application || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Category</label>
+                                                <input type="text" class="form-control form-control-modern" name="category" value="${product.category || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Product Name</label>
+                                                <input type="text" class="form-control form-control-modern" name="product_name" value="${product.product_name || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Make</label>
+                                                <input type="text" class="form-control form-control-modern" name="make" value="${product.make || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Model</label>
+                                                <input type="text" class="form-control form-control-modern" name="model" value="${product.model || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Specification</label>
+                                                <input type="text" class="form-control form-control-modern" name="specification" value="${product.specification || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">UOM</label>
+                                                <input type="text" class="form-control form-control-modern" name="uom" value="${product.uom || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Buying Price</label>
+                                                <input type="number" class="form-control form-control-modern buying-price-input" name="buying_price" value="${product.buying_price || 0}" required step="0.01" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Vendor</label>
+                                                <input type="text" class="form-control form-control-modern" name="vendor" value="${product.vendor || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Quotation Received Month</label>
+                                                <input type="text" class="form-control form-control-modern" name="quotation_received_month" value="${product.quotation_received_month || ''}" required placeholder="e.g., Mar 2025">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Lead Time</label>
+                                                <input type="text" class="form-control form-control-modern" name="lead_time" value="${product.lead_time || ''}" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Remarks</label>
+                                                <input type="text" class="form-control form-control-modern" name="remarks" value="${product.remarks || ''}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">List Price</label>
+                                                <input type="number" class="form-control form-control-modern" name="list_price" value="${product.list_price || 0}" required step="0.01" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Discount (%)</label>
+                                                <input type="number" class="form-control form-control-modern discount-input" name="discount" value="${product.discount || 0}" required step="1" min="0" max="100">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Sales Price</label>
+                                                <input type="number" class="form-control form-control-modern sales-price-input" name="sales_price" value="${product.sales_price || 0}" required step="0.01" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Sales Margin (%)</label>
+                                                <input type="number" class="form-control form-control-modern sales-margin-input" name="sales_margin" value="${product.sales_margin || 0}" required step="1" min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0 p-4">
+                                        <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-modern btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Modal -->
+                    <div class="modal modal-modern fade" id="deleteTotalsolutionsModal-${index + 1}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="${baseDeleteUrl}">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Delete Item</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <p>Are you sure you want to delete this item?</p>
+                                        <p class="text-muted"><small>${product.product_name}</small></p>
+                                    </div>
+                                    <div class="modal-footer border-0 p-4">
+                                        <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-modern btn-danger">Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $tableBody.append(row);
+            });
+            attachEditableFieldListeners();
+            attachImageUploadListeners();
         }
 
         // File upload validation
@@ -768,10 +969,12 @@
                             Object.keys(fields).forEach(field => {
                                 const $field = $(`.editable-field[data-row-id="${rowId}"][data-field="${field}"]`);
                                 $field.text(fields[field]);
+                                if (field === 'buying_price' && fields.buying_price_color) {
+                                    $field.css('color', fields.buying_price_color);
+                                }
                                 $field.addClass('text-success bg-success bg-opacity-10');
                                 setTimeout(() => $field.removeClass('text-success bg-success bg-opacity-10'), 1500);
                             });
-                            // Update the corresponding modal with new values
                             updateModalValues(rowId, fields);
                         });
                     } else {
@@ -820,13 +1023,17 @@
                 const slNo = parseInt($element.closest('tr').find('td:first-child').text()); // Get SL No
 
                 // Validate input
-                if (!value || isNaN(value)) {
+                if (!value || (field !== 'buying_price' && isNaN(value))) {
                     alert('Please enter a valid number.');
-                    $element.text($element.data('original-value') || ''); // Revert to original value
+                    $element.text($element.data('original-value') || '');
                     return;
                 }
 
-                value = parseInt(value); // Convert to integer
+                if (field === 'buying_price' || field === 'discount' || field === 'sales_price' || field === 'sales_margin') {
+                    value = parseFloat(value); // Allow decimals for these fields
+                } else {
+                    value = value; // Keep as string for non-numeric fields
+                }
 
                 // Store original value for potential revert
                 if (!$element.data('original-value')) {
@@ -857,9 +1064,52 @@
             });
         }
 
-        // Initial attachment of listeners
+        // Attach image upload listeners
+        function attachImageUploadListeners() {
+            $('.product-image-cell').off('click').on('click', function() {
+                const rowId = $(this).data('row-id');
+                const $cell = $(this);
+                
+                $('#imageUploadInput').off('change').on('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const formData = new FormData();
+                        formData.append('product_image', file);
+                        formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+                        $.ajax({
+                            url: '{% url "exapp:upload_image" 0 %}'.replace(/0/, rowId),
+                            method: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.success) {
+                                    $cell.html(`<img src="${response.image_url}" alt="Product Image" class="product-image">`);
+                                    $cell.addClass('text-success bg-success bg-opacity-10');
+                                    setTimeout(() => $cell.removeClass('text-success bg-success bg-opacity-10'), 1500);
+                                } else {
+                                    alert('Image upload failed: ' + response.message);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Image upload error:', xhr.status, xhr.statusText);
+                                alert('Failed to upload image. Server returned: ' + xhr.status + ' ' + xhr.statusText);
+                            }
+                        });
+                    }
+                    // Reset the input
+                    $(this).val('');
+                });
+                
+                $('#imageUploadInput').click();
+            });
+        }
+
+        // Initial attachment of listeners and modal value updates
         $(document).ready(function() {
             attachEditableFieldListeners();
+            attachImageUploadListeners();
 
             // Ensure modal reflects latest values when shown
             $('.action-btn.btn-outline-success').on('click', function() {
@@ -868,11 +1118,25 @@
                 const modalIndex = $row.find('td:first-child').text();
                 const $modal = $(`#editTotalsolutionsModal-${modalIndex}`);
 
-                // Update editable fields in the modal
-                $modal.find('input[name="buying_price"]').val($row.find('.editable-field[data-field="buying_price"]').text());
-                $modal.find('input[name="discount"]').val($row.find('.editable-field[data-field="discount"]').text());
-                $modal.find('input[name="sales_price"]').val($row.find('.editable-field[data-field="sales_price"]').text());
-                $modal.find('input[name="sales_margin"]').val($row.find('.editable-field[data-field="sales_margin"]').text());
+                // Update modal inputs with current table values
+                $modal.find('.buying-price-input').val($row.find('.editable-field[data-field="buying_price"]').text().trim());
+                $modal.find('.discount-input').val($row.find('.editable-field[data-field="discount"]').text().trim());
+                $modal.find('.sales-price-input').val($row.find('.editable-field[data-field="sales_price"]').text().trim());
+                $modal.find('.sales-margin-input').val($row.find('.editable-field[data-field="sales_margin"]').text().trim());
+
+                // Update other fields (non-editable in table)
+                $modal.find('input[name="application"]').val($row.find('td:nth-child(2)').text());
+                $modal.find('input[name="category"]').val($row.find('td:nth-child(3)').text());
+                $modal.find('input[name="product_name"]').val($row.find('td:nth-child(4)').text());
+                $modal.find('input[name="make"]').val($row.find('td:nth-child(6)').text());
+                $modal.find('input[name="model"]').val($row.find('td:nth-child(7)').text());
+                $modal.find('input[name="specification"]').val($row.find('td:nth-child(8)').text());
+                $modal.find('input[name="uom"]').val($row.find('td:nth-child(9)').text());
+                $modal.find('input[name="vendor"]').val($row.find('td:nth-child(11)').text());
+                $modal.find('input[name="quotation_received_month"]').val($row.find('td:nth-child(12)').text());
+                $modal.find('input[name="lead_time"]').val($row.find('td:nth-child(13)').text());
+                $modal.find('input[name="remarks"]').val($row.find('td:nth-child(14)').text());
+                $modal.find('input[name="list_price"]').val($row.find('td:nth-child(15)').text());
             });
         });
 

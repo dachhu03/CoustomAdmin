@@ -13,6 +13,8 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import secrets
 from django.core.exceptions import ValidationError
+from datetime import datetime
+import os
 
 
 @login_required
@@ -56,13 +58,14 @@ def totalsolutions(request):
     if category_filter != 'all':
         products = products.filter(category=category_filter)
     
-    category_options = ['all', 'software', 'hardware', 'services']
+    category_options = ['all', 'software', 'hardware', 'service']
     
     return render(request, 'totalsolutions.html', {
         'objs': products,
         'category_filter': category_filter,
         'search_query': search_query,
-        'category_options': category_options
+        'category_options': category_options,
+        'csrf_token': request.COOKIES.get('csrftoken', '')
     })
 
 
@@ -82,22 +85,24 @@ def search_products(request):
     data = [
         {
             'id': obj.id,
-            'application': obj.application,
-            'category': obj.category,
-            'product_name': obj.product_name,
-            'make': obj.make,
-            'model': obj.model,
-            'specification': obj.specification,
-            'uom': obj.uom,
-            'buying_price': float(obj.buying_price),
-            'vendor': obj.vendor,
-            'quotation_received_month': obj.quotation_received_month,
-            'lead_time': obj.lead_time,
-            'remarks': obj.remarks,
-            'list_price': float(obj.list_price),
-            'discount': int(obj.discount),
-            'sales_price': float(obj.sales_price),
-            'sales_margin': int(obj.sales_margin),
+            'application': obj.application or 'NAN',
+            'category': obj.category or 'NAN',
+            'product_name': obj.product_name or 'NAN',
+            'product_image': obj.product_image.url if obj.product_image else None,
+            'make': obj.make or 'NAN',
+            'model': obj.model or 'NAN',
+            'specification': obj.specification or 'NAN',
+            'uom': obj.uom or 'NAN',
+            'buying_price': float(obj.buying_price) if obj.buying_price is not None else 'NAN',
+            'buying_price_color': obj.buying_price_color,
+            'vendor': obj.vendor or 'NAN',
+            'quotation_received_month': obj.quotation_received_month or 'NAN',
+            'lead_time': obj.lead_time or 'NAN',
+            'remarks': obj.remarks or 'NAN',
+            'list_price': float(obj.list_price) if obj.list_price is not None else 'NAN',
+            'discount': int(obj.discount) if obj.discount is not None else 'NAN',
+            'sales_price': float(obj.sales_price) if obj.sales_price is not None else 'NAN',
+            'sales_margin': int(obj.sales_margin) if obj.sales_margin is not None else 'NAN',
         } for obj in products
     ]
     
@@ -108,24 +113,29 @@ def search_products(request):
 def additem(request):
     if request.method == 'POST':
         try:
-            Totalsolutions.objects.create(
-                application=request.POST.get('application'),
-                category=request.POST.get('category'),
-                product_name=request.POST.get('product_name'),
-                make=request.POST.get('make'),
-                model=request.POST.get('model'),
-                specification=request.POST.get('specification'),
-                uom=request.POST.get('uom'),
-                buying_price=float(request.POST.get('buying_price', 0)),
-                vendor=request.POST.get('vendor'),
-                quotation_received_month=request.POST.get('quotation_received_month'),
-                lead_time=request.POST.get('lead_time'),
-                remarks=request.POST.get('remarks'),
-                list_price=float(request.POST.get('list_price', 0)),
-                discount=int(float(request.POST.get('discount', 0))),
-                sales_price=float(request.POST.get('sales_price', 0)),
-                sales_margin=int(float(request.POST.get('sales_margin', 0))),
+            buying_price = float(request.POST.get('buying_price', 0))
+            list_price = float(request.POST.get('list_price', 0))
+            discount = int(float(request.POST.get('discount', 0)))
+
+            item = Totalsolutions(
+                application=request.POST.get('application') or None,
+                category=request.POST.get('category') or None,
+                product_name=request.POST.get('product_name') or None,
+                make=request.POST.get('make') or None,
+                model=request.POST.get('model') or None,
+                specification=request.POST.get('specification') or None,
+                uom=request.POST.get('uom') or None,
+                buying_price=buying_price,
+                vendor=request.POST.get('vendor') or None,
+                quotation_received_month=request.POST.get('quotation_received_month') or None,
+                lead_time=request.POST.get('lead_time') or None,
+                remarks=request.POST.get('remarks') or None,
+                list_price=list_price,
+                discount=discount,
             )
+            if 'product_image' in request.FILES:
+                item.product_image = request.FILES['product_image']
+            item.save()
             messages.success(request, "Item added successfully.")
         except (ValueError, IntegrityError) as e:
             messages.error(request, f"Error adding item: {str(e)}")
@@ -136,6 +146,9 @@ def additem(request):
 @login_required
 def delete_all(request):
     if request.method == 'POST':
+        for item in Totalsolutions.objects.all():
+            if item.product_image and os.path.isfile(item.product_image.path):
+                os.remove(item.product_image.path)
         Totalsolutions.objects.all().delete()
         messages.success(request, 'All items have been deleted successfully.')
     return redirect('exapp:totalsolutions')
@@ -146,6 +159,8 @@ def delete(request, id):
     item = get_object_or_404(Totalsolutions, id=id)
     if request.method == 'POST':
         item_name = str(item)
+        if item.product_image and os.path.isfile(item.product_image.path):
+            os.remove(item.product_image.path)
         item.delete()
         messages.success(request, f'The item "{item_name}" has been successfully deleted.')
         return redirect('exapp:totalsolutions')
@@ -170,25 +185,27 @@ def edit(request, id):
             ]:
                 if field == 'list_price':
                     value = max(float(value), 0)
+                    item.list_price = value
+                    item.save()
                 elif field == 'discount':
                     value = int(float(value.replace('%', '')))
-                    list_price = float(item.list_price)
-                    sales_price = max(list_price - (list_price * value / 100), 0)
-                    buying_price = float(item.buying_price)
-                    sales_margin = int((sales_price - buying_price) / sales_price * 100) if sales_price > 0 else 0
-                    item.sales_price = sales_price
-                    item.sales_margin = sales_margin
-                elif field == 'sales_margin':
-                    value = int(float(value))
-
-                setattr(item, field, value)
-                item.save()
+                    item.discount = value
+                    item.save()
+                elif field == 'buying_price':
+                    value = max(float(value), 0)
+                    item.buying_price = value
+                    item.save()
+                else:
+                    setattr(item, field, value)
+                    item.save(update_fields=[field])
 
                 return JsonResponse({
                     'success': True,
                     'message': f'{field} updated successfully.',
                     'sales_price': item.sales_price,
-                    'sales_margin': item.sales_margin
+                    'sales_margin': item.sales_margin,
+                    'buying_price': item.buying_price,
+                    'buying_price_color': item.buying_price_color
                 })
             else:
                 return JsonResponse({'success': False, 'message': 'Invalid field.'})
@@ -197,29 +214,20 @@ def edit(request, id):
 
     if request.method == 'POST':
         try:
-            list_price = max(float(request.POST.get('list_price', 0)), 0)
-            discount_value = request.POST.get('discount', '0').replace('%', '')
-            discount = int(float(discount_value)) if discount_value else 0
-            buying_price = max(float(request.POST.get('buying_price', 0)), 0)
-            sales_price = max(list_price - (list_price * discount / 100), 0)
-            sales_margin = int((sales_price - buying_price) / sales_price * 100) if sales_price > 0 else 0
-
-            item.application = request.POST.get('application')
-            item.category = request.POST.get('category')
-            item.product_name = request.POST.get('product_name')
-            item.make = request.POST.get('make')
-            item.model = request.POST.get('model')
-            item.specification = request.POST.get('specification')
-            item.uom = request.POST.get('uom')
-            item.buying_price = buying_price
-            item.vendor = request.POST.get('vendor')
-            item.quotation_received_month = request.POST.get('quotation_received_month')
-            item.lead_time = request.POST.get('lead_time')
-            item.remarks = request.POST.get('remarks')
-            item.list_price = list_price
-            item.discount = discount
-            item.sales_price = sales_price
-            item.sales_margin = sales_margin
+            item.application = request.POST.get('application') or None
+            item.category = request.POST.get('category') or None
+            item.product_name = request.POST.get('product_name') or None
+            item.make = request.POST.get('make') or None
+            item.model = request.POST.get('model') or None
+            item.specification = request.POST.get('specification') or None
+            item.uom = request.POST.get('uom') or None
+            item.buying_price = max(float(request.POST.get('buying_price', 0)), 0)
+            item.vendor = request.POST.get('vendor') or None
+            item.quotation_received_month = request.POST.get('quotation_received_month') or None
+            item.lead_time = request.POST.get('lead_time') or None
+            item.remarks = request.POST.get('remarks') or None
+            item.list_price = max(float(request.POST.get('list_price', 0)), 0)
+            item.discount = int(float(request.POST.get('discount', 0)))
             item.save()
 
             item_name = str(item)
@@ -243,24 +251,26 @@ def upload_file(request):
         if file:
             try:
                 if file.name.endswith('.csv'):
-                    df = pd.read_csv(file)
+                    df = pd.read_csv(file, dtype={'quotation_received_month': str})
                 elif file.name.endswith(('.xls', '.xlsx')):
-                    df = pd.read_excel(file)
+                    df = pd.read_excel(file, dtype={'quotation_received_month': str})
                 else:
                     raise ValueError("Unsupported file format. Please upload a CSV or Excel file.")
                 
                 df['category'] = df['category'].str.strip().str.lower()
+                df = df.dropna(how='all')
+                df.columns = df.columns.str.strip().str.lower()
 
                 required_columns = [
                     'application', 'category', 'product_name', 'make', 'model', 'specification',
                     'uom', 'buying_price', 'vendor', 'quotation_received_month',
-                    'lead_time', 'remarks', 'list_price', 'discount', 'sales_price', 'sales_margin'
+                    'lead_time', 'remarks', 'list_price', 'discount'
                 ]
                 missing_columns = set(required_columns) - set(df.columns)
                 if missing_columns:
                     raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
                 
-                if category_filter != 'all' and category_filter in ['software', 'hardware', 'services']:
+                if category_filter != 'all' and category_filter in ['software', 'hardware', 'service']:
                     df = df[df['category'] == category_filter.lower()]
                 
                 skipped_duplicates = []
@@ -278,9 +288,27 @@ def upload_file(request):
 
                         if not exists:
                             row_dict = row.to_dict()
-                            row_dict['discount'] = int(float(row_dict.get('discount', 0)))
-                            row_dict['sales_margin'] = int(float(row_dict.get('sales_margin', 0)))
-                            Totalsolutions.objects.create(**row_dict)
+                            buying_price = float(row_dict.get('buying_price', 0))
+                            list_price = float(row_dict.get('list_price', 0))
+                            discount = int(float(row_dict.get('discount', 0)))
+
+                            item = Totalsolutions(
+                                application=row_dict.get('application'),
+                                category=row_dict.get('category'),
+                                product_name=row_dict.get('product_name'),
+                                make=row_dict.get('make'),
+                                model=row_dict.get('model'),
+                                specification=row_dict.get('specification'),
+                                uom=row_dict.get('uom'),
+                                buying_price=buying_price,
+                                vendor=row_dict.get('vendor'),
+                                quotation_received_month=row_dict.get('quotation_received_month'),
+                                lead_time=row_dict.get('lead_time'),
+                                remarks=row_dict.get('remarks'),
+                                list_price=list_price,
+                                discount=discount,
+                            )
+                            item.save()
                             saved_entries += 1
                         else:
                             skipped_duplicates.append(row.to_dict())
@@ -291,7 +319,7 @@ def upload_file(request):
                 if saved_entries > 0:
                     messages.success(request, f"File uploaded successfully. {saved_entries} new entries saved.")
                 elif skipped_duplicates:
-                    messages.warning(request, f"The file contains {len(skipped_duplicates)} entries that already exist. No new entries were added.")
+                    messages.warning(request, f"The file contains {len(skipped_duplicates)} entries that already exist.")
             except Exception as e:
                 messages.error(request, f"Error: {str(e)}")
         else:
@@ -326,28 +354,11 @@ def update_field(request):
                         elif field_type == "BooleanField":
                             value = value.lower() in ["true", "1"]
                         else:
-                            value = str(value) if value is not None else ""
+                            value = str(value) if value is not None else None
 
-                        if field == 'discount':
-                            discount = value
-                            list_price = float(obj.list_price or 0)
-                            sales_price = max(list_price - (list_price * discount / 100), 0)
-                            buying_price = float(obj.buying_price or 0)
-                            sales_margin = int((sales_price - buying_price) / sales_price * 100) if sales_price > 0 else 0
-                            obj.discount = discount  # Fixed typo here
-                            obj.sales_price = sales_price
-                            obj.sales_margin = sales_margin
-                            update_fields.extend(['discount', 'sales_price', 'sales_margin'])
-                        elif field == 'buying_price':
-                            buying_price = value
-                            list_price = float(obj.list_price or 0)
-                            discount = float(obj.discount or 0)
-                            sales_price = max(list_price - (list_price * discount / 100), 0)
-                            sales_margin = int((sales_price - buying_price) / sales_price * 100) if sales_price > 0 else 0
-                            obj.buying_price = buying_price
-                            obj.sales_price = sales_price
-                            obj.sales_margin = sales_margin
-                            update_fields.extend(['buying_price', 'sales_price', 'sales_margin'])
+                        if field in ['discount', 'buying_price', 'list_price']:
+                            setattr(obj, field, value)
+                            update_fields.extend(['sales_price', 'sales_margin', field])
                         else:
                             setattr(obj, field, value)
                             update_fields.append(field)
@@ -357,7 +368,8 @@ def update_field(request):
                     'discount': str(obj.discount),
                     'sales_price': str(obj.sales_price),
                     'sales_margin': str(obj.sales_margin),
-                    'buying_price': str(obj.buying_price)
+                    'buying_price': str(obj.buying_price),
+                    'buying_price_color': obj.buying_price_color
                 }
 
             return JsonResponse({
@@ -372,6 +384,26 @@ def update_field(request):
         except Exception as e:
             return JsonResponse({"status": "error", "message": f"Server error: {str(e)}"}, status=500)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+@login_required
+def upload_image(request, id):
+    if request.method == 'POST':
+        item = get_object_or_404(Totalsolutions, id=id)
+        if 'product_image' in request.FILES:
+            # Delete old image if it exists
+            if item.product_image and os.path.isfile(item.product_image.path):
+                os.remove(item.product_image.path)
+            item.product_image = request.FILES['product_image']
+            item.save()
+            return JsonResponse({
+                'success': True,
+                'message': 'Image uploaded successfully.',
+                'image_url': item.product_image.url
+            })
+        return JsonResponse({'success': False, 'message': 'No image file provided.'})
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
 
 def boq(request):

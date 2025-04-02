@@ -20,6 +20,8 @@ path('login/', login_view, name='login'),
  path('view-with-token' , view_with_token , name= 'view_with_token'),
  path('validate-token' , validate_token , name='validate_token'),
  path('update-field/', update_field, name='update_field'),
+ path('search-products/', search_products, name='search_products'),
+ path('upload-image/<int:id>/', upload_image, name='upload_image'),
  
 
  
