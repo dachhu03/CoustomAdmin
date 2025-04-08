@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login
-from .models import Totalsolutions
+from .models import Totalsolutions, SIProject, DirectProject
 import pandas as pd
 from django.contrib import messages
 from django.db import IntegrityError
@@ -15,7 +15,6 @@ import secrets
 from django.core.exceptions import ValidationError
 from datetime import datetime
 import os
-
 
 @login_required
 def home(request):
@@ -32,7 +31,6 @@ def home(request):
     }
     return render(request, "home.html", context)
 
-
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -42,9 +40,8 @@ def login_view(request):
             login(request, user)
             return redirect('exapp:home')
         else:
-            messages.error(request, "Invalid username or password.")
+            messages.error(request, 'Invalid username or password', extra_tags='login_error')
     return render(request, 'login.html')
-
 
 def totalsolutions(request):
     search_query = request.GET.get('search', '')
@@ -67,7 +64,6 @@ def totalsolutions(request):
         'category_options': category_options,
         'csrf_token': request.COOKIES.get('csrftoken', '')
     })
-
 
 @login_required
 def search_products(request):
@@ -108,7 +104,6 @@ def search_products(request):
     
     return JsonResponse({'products': data})
 
-
 @login_required
 def additem(request):
     if request.method == 'POST':
@@ -142,7 +137,6 @@ def additem(request):
         return redirect('exapp:totalsolutions')
     return render(request, 'totalsolutions.html')
 
-
 @login_required
 def delete_all(request):
     if request.method == 'POST':
@@ -152,7 +146,6 @@ def delete_all(request):
         Totalsolutions.objects.all().delete()
         messages.success(request, 'All items have been deleted successfully.')
     return redirect('exapp:totalsolutions')
-
 
 @login_required
 def delete(request, id):
@@ -165,7 +158,6 @@ def delete(request, id):
         messages.success(request, f'The item "{item_name}" has been successfully deleted.')
         return redirect('exapp:totalsolutions')
     return render(request, 'totalsolutions.html', {'item': item})
-
 
 @login_required
 def edit(request, id):
@@ -238,7 +230,6 @@ def edit(request, id):
             return redirect('exapp:totalsolutions')
 
     return render(request, 'totalsolutions.html', {'item': item})
-
 
 @login_required
 def upload_file(request):
@@ -327,7 +318,6 @@ def upload_file(request):
     
         return redirect(f"{reverse('exapp:totalsolutions')}?category={category_filter}&search={search_query}")
 
-
 @csrf_exempt
 @login_required
 def update_field(request):
@@ -385,14 +375,12 @@ def update_field(request):
             return JsonResponse({"status": "error", "message": f"Server error: {str(e)}"}, status=500)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
 
-
 @csrf_exempt
 @login_required
 def upload_image(request, id):
     if request.method == 'POST':
         item = get_object_or_404(Totalsolutions, id=id)
         if 'product_image' in request.FILES:
-            # Delete old image if it exists
             if item.product_image and os.path.isfile(item.product_image.path):
                 os.remove(item.product_image.path)
             item.product_image = request.FILES['product_image']
@@ -405,20 +393,16 @@ def upload_image(request, id):
         return JsonResponse({'success': False, 'message': 'No image file provided.'})
     return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
-
 def boq(request):
     return render(request, 'boq.html', {})
 
-
 def generate_token():
     return secrets.token_urlsafe()
-
 
 def view_with_token(request):
     token = generate_token()
     request.session['access_token'] = token
     return render(request, 'login.html', {'token': token})
-
 
 def validate_token(request):
     token = request.GET.get('token')
@@ -426,3 +410,47 @@ def validate_token(request):
     if token != session_token:
         return HttpResponseForbidden("Invalid access.")
     return render(request, 'login.html')
+
+@login_required
+def projects(request):
+    products = Totalsolutions.objects.all()
+    si_projects = SIProject.objects.all()
+    direct_projects = DirectProject.objects.all()
+
+    if request.method == 'POST':
+        approach = request.POST.get('approach')
+        
+        if approach == 'si':
+            project_name = request.POST.get('si_project_name')
+            price = request.POST.get('si_price')
+            duration = request.POST.get('si_duration')
+            si_name = request.POST.get('si_name')
+            product_id = request.POST.get('si_product')
+            SIProject.objects.create(
+                project_name=project_name,
+                price=price,
+                duration=duration,
+                si_name=si_name,
+                product=Totalsolutions.objects.get(id=product_id) if product_id else None
+            )
+            messages.success(request, "SI Project added successfully.")
+        elif approach == 'direct':
+            project_name = request.POST.get('direct_project_name')
+            price = request.POST.get('direct_price')
+            duration = request.POST.get('direct_duration')
+            product_id = request.POST.get('direct_product')
+            DirectProject.objects.create(
+                project_name=project_name,
+                price=price,
+                duration=duration,
+                product=Totalsolutions.objects.get(id=product_id) if product_id else None
+            )
+            messages.success(request, "Direct Project added successfully.")
+        return redirect('exapp:projects')
+    
+    context = {
+        'products': products,
+        'si_projects': si_projects,
+        'direct_projects': direct_projects,
+    }
+    return render(request, 'projects.html', context)

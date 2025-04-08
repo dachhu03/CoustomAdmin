@@ -22,7 +22,7 @@ path('login/', login_view, name='login'),
  path('update-field/', update_field, name='update_field'),
  path('search-products/', search_products, name='search_products'),
  path('upload-image/<int:id>/', upload_image, name='upload_image'),
- 
+ path('projects/', projects, name='projects'),
 
  
 ]
