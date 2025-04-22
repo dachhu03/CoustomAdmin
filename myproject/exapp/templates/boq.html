@@ -1,255 +1,1463 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects - Project Management</title>
+    <title>Solution Template - Smart Parking Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    
     <style>
         * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-body {
-    background-color: #f0f8ff;
-    color: #333;
-}
+        body {
+            background: linear-gradient(135deg, #f0f8ff, #e6f0fa);
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
 
-/* Header Styles */
-.header {
-    background-color: #87ceeb;
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        /* Enhanced Modern Sidebar */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1e3c72, #2a5298);
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.15);
+        }
 
-.header h1 {
-    color: white;
-    font-size: 24px;
-}
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+        }
 
-.dropdown-container {
-    position: relative;
-}
+        .sidebar h2 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
 
-.dropdown {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-}
+        .sidebar .nav-item {
+            width: 100%;
+            margin-bottom: 5px;
+        }
 
-.dropdown:hover {
-    background-color: #e0f7ff;
-}
+        .sidebar .nav-link {
+            color: #d1e8ff;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid transparent;
+        }
 
-/* Main Content */
-.container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-left: 4px solid #00c4cc;
+        }
 
-.form-section {
-    margin-top: 20px;
-}
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
 
-.form-group {
-    margin-bottom: 15px;
-}
+        .sidebar .nav-link::after {
+            content: '\f078'; /* Chevron down */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #4682b4;
-}
+        .sidebar .nav-item.active .nav-link {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #00c4cc;
+        }
 
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #87ceeb;
-    border-radius: 5px;
-    font-size: 14px;
-}
+        .sidebar .nav-item.active .nav-link::after {
+            transform: rotate(180deg);
+        }
 
-.submit-btn {
-    background-color: #87ceeb;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        /* Fixed dropdown menu with white background */
+        .sidebar .dropdown-menu {
+            background: #ffffff; /* White background */
+            padding: 0;
+            display: none; /* Start with display none */
+            border-left: 4px solid rgba(0, 196, 204, 0.5);
+        }
 
-.submit-btn:hover {
-    background-color: #4682b4;
-}
+        .sidebar .nav-item.active .dropdown-menu {
+            display: block; /* Show when active */
+        }
 
-.message {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-}
+        .sidebar .dropdown-item {
+            color: #333; /* Adjusted text color for white background */
+            padding: 10px 20px 10px 45px;
+            font-size: 14px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            position: relative;
+        }
 
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
-}
+        .sidebar .dropdown-item:hover {
+            color: #ffffff;
+            background: rgba(0, 196, 204, 0.8); /* Light teal hover effect */
+        }
 
-.message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
+        .sidebar .dropdown-item::before {
+            content: '\f054'; /* Chevron right */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 10px;
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00c4cc;
+            opacity: 0.7;
+        }
 
-.projects-section {
-    margin-top: 30px;
-}
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
 
-.projects-section h2, .projects-section h3 {
-    color: #4682b4;
-    margin-bottom: 10px;
-}
+        /* Enhanced Modern Header */
+        .header {
+            background: linear-gradient(90deg, #00c4cc, #007bff);
+            padding: 20px 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
 
-.projects-section ul {
-    list-style-type: none;
-    padding-left: 0;
-}
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
 
-.projects-section li {
-    padding: 8px 0;
-    border-bottom: 1px solid #87ceeb;
-}
+        .header h1 {
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 600;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin: 0;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .header .btn-modern {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header .btn-modern:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+        }
+
+        /* Dropdown Group for Alignment */
+        .dropdown-group {
+            display: flex;
+            gap: 10px; /* Reduced space between dropdowns */
+            align-items: center;
+        }
+
+        /* Compact and Enhanced Dropdown */
+        .dropdown-container {
+            position: relative;
+            width: 150px; /* Reduced width */
+        }
+
+        .dropdown {
+            padding: 8px 15px; /* Reduced padding for compactness */
+            font-size: 14px; /* Smaller font size */
+            border: 1px solid #ddd; /* Subtle border */
+            border-radius: 20px; /* Less rounded */
+            background: #ffffff;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            appearance: none;
+            position: relative;
+        }
+
+        .dropdown:hover, .dropdown:focus {
+            background: #e0f7ff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transform: scale(1.02); /* Subtle scale effect */
+            outline: none;
+        }
+
+        .dropdown-container::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 10px; /* Smaller chevron */
+            position: absolute;
+            right: 12px; /* Adjusted position */
+            top: 50%;
+            transform: translateY(-50%);
+            color: #333;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown:focus + .dropdown-container::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        /* Enhanced Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Template Container Styles */
+        .template-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0f0ff;
+        }
+
+        .template-header h2 {
+            color: #1e3c72;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .template-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .info-card {
+            background: #f9fbff;
+            border-radius: 8px;
+            padding: 15px;
+            flex: 1;
+            min-width: 200px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-card h3 {
+            color: #2a5298;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-card p {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00c4cc;
+            margin: 0;
+        }
+
+        /* Section Styles */
+        .section-title {
+            margin: 30px 0 15px;
+            color: #1e3c72;
+            font-size: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0f0ff;
+        }
+
+        /* Product List Styles */
+        .product-search {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .product-search input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #d1e8ff;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .product-search button {
+            background: linear-gradient(90deg, #00c4cc, #007bff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .product-search button:hover {
+            background: linear-gradient(90deg, #007bff, #00c4cc);
+            transform: translateY(-2px);
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .product-table th, .product-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0f0ff;
+        }
+
+        .product-table th {
+            background-color: #f0f8ff;
+            color: #1e3c72;
+            font-weight: 600;
+        }
+
+        .product-table tr:hover {
+            background-color: #f9fbff;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-add, .btn-remove {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add {
+            background-color: #00c4cc;
+            color: white;
+        }
+
+        .btn-remove {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .btn-add:hover, .btn-remove:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Selected Products Table */
+        .selected-products {
+            margin-top: 20px;
+        }
+
+        .selected-products table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .selected-products th, .selected-products td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0f0ff;
+        }
+
+        .selected-products th {
+            background-color: #f0f8ff;
+            color: #1e3c72;
+            font-weight: 600;
+        }
+
+        .category-select {
+            padding: 5px 10px;
+            border: 1px solid #d1e8ff;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        /* AMC Section */
+        .amc-form {
+            background: #f9fbff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .amc-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .amc-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2a5298;
+            font-weight: 500;
+        }
+
+        .amc-form input, .amc-form textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #d1e8ff;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        /* Total section */
+        .total-section {
+            background: #f9fbff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .total-label {
+            font-weight: 600;
+            margin-right: 20px;
+            color: #1e3c72;
+            min-width: 150px;
+            text-align: right;
+        }
+
+        .total-value {
+            font-weight: 700;
+            color: #00c4cc;
+            min-width: 150px;
+            text-align: right;
+        }
+
+        .grand-total {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3c72;
+            padding-top: 10px;
+            border-top: 2px solid #d1e8ff;
+        }
+
+        /* Download buttons */
+        .download-options {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .download-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-pdf {
+            background-color: #ff6b6b;
+        }
+
+        .btn-excel {
+            background-color: #20bf6b;
+        }
+
+        .btn-csv {
+            background-color: #2d98da;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 250px;
+            }
+            .main-content {
+                width: calc(100% - 250px);
+                margin-left: 250px;
+            }
+            .template-info {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding-bottom: 10px;
+                max-height: none;
+                overflow-y: visible;
+            }
+            .sidebar-header {
+                padding: 15px;
+                margin-bottom: 10px;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+            }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+                text-align: center;
+            }
+            .header .btn-modern, 
+            .header h1, 
+            .dropdown-group {
+                width: 100%;
+                text-align: center;
+            }
+            .dropdown-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .dropdown-container {
+                width: 100%; /* Full width on mobile */
+            }
+            .header .btn-modern {
+                justify-content: center;
+            }
+            .container {
+                padding: 15px;
+            }
+            .product-table {
+                display: block;
+                overflow-x: auto;
+            }
+            .total-section {
+                padding: 15px;
+            }
+            .download-options {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+        }
+
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            width: 100%;
+            text-align: left;
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .mobile-menu-toggle i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .sidebar-nav {
+                display: none;
+            }
+            .sidebar.mobile-open .sidebar-nav {
+                display: block;
+            }
+            .sidebar.mobile-open .mobile-menu-toggle i {
+                transform: translateY(-50%) rotate(180deg);
+            }
+        }
+
+        /* Product search results */
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #d1e8ff;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e0f0ff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background-color: #f0f8ff;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-
-        <a href="{% url 'exapp:home' %}" class="btn btn-modern" title="Home">
-            <i class="mdi mdi-home" style="font-size: 26px; color: var(--primary);"></i>
-        </a>
-
-        <h1>BOQ Generation</h1>
-        <div class="dropdown-container">
-            <select class="dropdown" id="approach" onchange="toggleForm()">
-                <option value="">Select Approach</option>
-                <option value="si">SI</option>
-                <option value="direct">Direct Purchase</option>
-            </select>
+    <!-- Enhanced Modern Sidebar with Mobile Toggle -->
+    <div class="sidebar" id="sidebar">
+        <button class="mobile-menu-toggle" id="mobile-toggle">
+            <span>Smart Parking Menu</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        
+        <div class="sidebar-nav">
+            <div class="sidebar-header">
+                <h2>Smart Solutions</h2>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-lock"></i> Intelligent Access Control</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Access Control with RFID/FastTag </a>
+                    <a class="dropdown-item" href="#">Access Control with RFID + ANPR</a>
+                    <a class="dropdown-item" href="#">Access Control with QR code</a>
+                    <a class="dropdown-item" href="#">Access Control with NFC card</a>
+                    <a class="dropdown-item" href="#">Access Control with ANPR + Face Recording</a>
+                    <a class="dropdown-item" href="#">Multi-Tenant Access Control with ANPR</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-parking"></i> Real-Time Parking</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Availability with camera counter</a>
+                    <a class="dropdown-item" href="#">Availability with RFID counter</a>
+                    <a class="dropdown-item" href="#">Availability and guidance with PZQube slot sensor</a>
+                    <a class="dropdown-item" href="#">Availability with EPLD cameras</a>
+                    <a class="dropdown-item" href="#">Availability with loop counter</a>
+                    <a class="dropdown-item" href="#">Availability with In/out counter</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-credit-card"></i> Payments</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Payment with FastTag</a>
+                    <a class="dropdown-item" href="#">Payments with ticket vending machine</a>
+                    <a class="dropdown-item" href="#">Fare calculations with RFID Reader</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-shield-alt"></i> Safety Features</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">OverSpeed detection with camera</a>
+                    <a class="dropdown-item" href="#">OverSpeed detection with camera + RADAR</a>
+                    <a class="dropdown-item" href="#">Wrong Parking detection</a>
+                    <a class="dropdown-item" href="#">Wrong way driving detection</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-plus-circle"></i> Value Added Service</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Integration with EV charging-Availability</a>
+                    <a class="dropdown-item" href="#">Car Service Integration</a>
+                    <a class="dropdown-item" href="#">Find My car</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-cogs"></i> Other Features</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">3rd Party Integration with iBMS etc</a>
+                    <a class="dropdown-item" href="#">Parking reservation with RFID</a>
+                    <a class="dropdown-item" href="#">Parking reservation and check-in with QR code</a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <a href="{% url 'exapp:home' %}" class="btn-modern" title="Home">
+                <i class="fas fa-home" style="font-size: 22px;"></i>
+            </a>
+            <h1>Solution Template</h1>
+            <div class="dropdown-group">
+                <div class="dropdown-container">
+                    <select class="dropdown" id="approach">
+                        <option value="si">SI</option>
+                        <option value="direct">Direct Purchase</option>
+                    </select>
+                </div>
+                <div class="dropdown-container">
+                    <select class="dropdown" id="budget">
+                        <option value="standard">Standard</option>
+                        <option value="premium">Premium</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-        <!-- SI Form -->
-        <form id="si-form" class="form-section" style="display: none;" method="POST" action="">
-            {% csrf_token %}
-            <input type="hidden" name="approach" value="si">
-            <h2>SI Approach</h2>
-            <div class="form-group">
-                <label for="si_project_name">Project Name</label>
-                <input type="text" id="si_project_name" name="si_project_name" placeholder="Enter project name" required>
+        <div class="container">
+            <!-- Template Header Section -->
+            <div class="template-container">
+                <div class="template-header">
+                    <h2 id="solution-title">Solution Template</h2>
+                </div>
+                
+                <div class="template-info">
+                    <div class="info-card">
+                        <h3>Project Name</h3>
+                        <p id="project-name">Smart Parking Project</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Approach</h3>
+                        <p id="approach-display">SI</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Budget</h3>
+                        <p id="budget-display">Standard</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Date</h3>
+                        <p id="date-display">April 14, 2025</p>
+                    </div>
+                </div>
+                
+                <!-- Hardware Section -->
+                <h3 class="section-title">Hardware Components</h3>
+                <div class="product-search">
+                    <input type="text" id="hardware-search" placeholder="Search for hardware products...">
+                    <button id="search-hw-btn"><i class="fas fa-search"></i> Search</button>
+                </div>
+                
+                <div id="hardware-search-results" class="search-results">
+                    <!-- Search results will be populated here -->
+                </div>
+                
+                <div class="selected-products">
+                    <table id="hardware-table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Model</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Selected hardware products will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Software Section -->
+                <h3 class="section-title">Software Components</h3>
+                <div class="product-search">
+                    <input type="text" id="software-search" placeholder="Search for software products...">
+                    <button id="search-sw-btn"><i class="fas fa-search"></i> Search</button>
+                </div>
+                
+                <div id="software-search-results" class="search-results">
+                    <!-- Search results will be populated here -->
+                </div>
+                
+                <div class="selected-products">
+                    <table id="software-table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Version</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Selected software products will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Services Section -->
+                <h3 class="section-title">Services</h3>
+                <div class="product-search">
+                    <input type="text" id="service-search" placeholder="Search for services...">
+                    <button id="search-svc-btn"><i class="fas fa-search"></i> Search</button>
+                </div>
+                
+                <div id="service-search-results" class="search-results">
+                    <!-- Search results will be populated here -->
+                </div>
+                
+                <div class="selected-products">
+                    <table id="service-table">
+                        <thead>
+                            <tr>
+                                <th>Service Name</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Selected service products will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- AMC Section -->
+                <h3 class="section-title">Annual Maintenance Contract (AMC)</h3>
+                <div class="amc-form">
+                    <div class="form-group">
+                        <label for="amc-plan">AMC Plan</label>
+                        <select id="amc-plan" class="dropdown">
+                            <option value="standard">Standard AMC (8x5)</option>
+                            <option value="enhanced">Enhanced AMC (12x6)</option>
+                            <option value="premium">Premium AMC (24x7)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amc-duration">Duration (Years)</label>
+                        <input type="number" id="amc-duration" min="1" max="5" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="amc-percentage">AMC Cost (% of Hardware Cost)</label>
+                        <input type="number" id="amc-percentage" min="0" max="100" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="amc-notes">Additional Notes</label>
+                        <textarea id="amc-notes" rows="3" placeholder="Enter any specific AMC requirements..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Total Section -->
+                <h3 class="section-title">Cost Summary</h3>
+                <div class="total-section">
+                    <div class="total-row">
+                        <div class="total-label">Hardware Total:</div>
+                        <div class="total-value" id="hardware-total">₹0.00</div>
+                    </div>
+                    <div class="total-row">
+                        <div class="total-label">Software Total:</div>
+                        <div class="total-value" id="software-total">₹0.00</div>
+                    </div>
+                    <div class="total-row">
+                        <div class="total-label">Services Total:</div>
+                        <div class="total-value" id="service-total">₹0.00</div>
+                    </div>
+                    <div class="total-row">
+                        <div class="total-label">AMC Total:</div>
+                        <div class="total-value" id="amc-total">₹0.00</div>
+                    </div>
+                    <div class="total-row grand-total">
+                        <div class="total-label">Grand Total:</div>
+                        <div class="total-value" id="grand-total">₹0.00</div>
+                    </div>
+                </div>
+                
+                <!-- Download Buttons -->
+                <div class="download-options">
+                    <button class="download-btn btn-pdf" id="download-pdf">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
+                    <button class="download-btn btn-excel" id="download-excel">
+                        <i class="fas fa-file-excel"></i> Download Excel
+                    </button>
+                    <button class="download-btn btn-csv" id="download-csv">
+                        <i class="fas fa-file-csv"></i> Download CSV
+                    </button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="si_price">Price</label>
-                <input type="number" step="0.01" id="si_price" name="si_price" placeholder="Enter price" required>
-            </div>
-            <div class="form-group">
-                <label for="si_duration">Duration (days)</label>
-                <input type="number" id="si_duration" name="si_duration" placeholder="Enter duration" required>
-            </div>
-            <div class="form-group">
-                <label for="si_name">SI Name</label>
-                <input type="text" id="si_name" name="si_name" placeholder="Enter SI name" required>
-            </div>
-            <div class="form-group">
-                <label for="si_product">Select Product (Optional)</label>
-                <select id="si_product" name="si_product" class="dropdown">
-                    <option value="">-- Select Product --</option>
-                    {% for product in products %}
-                        <option value="{{ product.id }}">{{ product.product_name }} ({{ product.category }})</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="submit-btn">Submit</button>
-        </form>
-
-        <!-- Direct Purchase Form -->
-        <form id="direct-form" class="form-section" style="display: none;" method="POST" action="">
-            {% csrf_token %}
-            <input type="hidden" name="approach" value="direct">
-            <h2>Direct Purchase</h2>
-            <div class="form-group">
-                <label for="direct_project_name">Project Name</label>
-                <input type="text" id="direct_project_name" name="direct_project_name" placeholder="Enter project name" required>
-            </div>
-            <div class="form-group">
-                <label for="direct_price">Price</label>
-                <input type="number" step="0.01" id="direct_price" name="direct_price" placeholder="Enter price" required>
-            </div>
-            <div class="form-group">
-                <label for="direct_duration">Duration (days)</label>
-                <input type="number" id="direct_duration" name="direct_duration" placeholder="Enter duration" required>
-            </div>
-            <div class="form-group">
-                <label for="direct_product">Select Product (Optional)</label>
-                <select id="direct_product" name="direct_product" class="dropdown">
-                    <option value="">-- Select Product --</option>
-                    {% for product in products %}
-                        <option value="{{ product.id }}">{{ product.product_name }} ({{ product.category }})</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="submit-btn">Submit</button>
-        </form>
-
-        <!-- Display Projects -->
-        <div class="projects-section">
-            <h2>Saved Projects</h2>
-            <h3>SI Projects</h3>
-            <ul>
-                {% for project in si_projects %}
-                    <li>{{ project.project_name }} - Price: {{ project.price }} - Duration: {{ project.duration }} days - SI: {{ project.si_name }} {% if project.product %} (Product: {{ project.product.product_name }}) {% endif %}</li>
-                {% empty %}
-                    <li>No SI projects yet.</li>
-                {% endfor %}
-            </ul>
-            <h3>Direct Projects</h3>
-            <ul>
-                {% for project in direct_projects %}
-                    <li>{{ project.project_name }} - Price: {{ project.price }} - Duration: {{ project.duration }} days {% if project.product %} (Product: {{ project.product.product_name }}) {% endif %}</li>
-                {% empty %}
-                    <li>No Direct projects yet.</li>
-                {% endfor %}
-            </ul>
         </div>
     </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
-        function toggleForm() {
-            const approach = document.getElementById('approach').value;
-            document.getElementById('si-form').style.display = approach === 'si' ? 'block' : 'none';
-            document.getElementById('direct-form').style.display = approach === 'direct' ? 'block' : 'none';
+        // Sample product data (replace with your actual data from database)
+        const productDatabase = {
+            hardware: [
+                { id: 1, name: "RFID Reader Gate", category: "Access Control", model: "RFG-2000", price: 12500 },
+                { id: 2, name: "ANPR Camera", category: "Surveillance", model: "ANP-HD120", price: 18500 },
+                { id: 3, name: "Boom Barrier", category: "Access Control", model: "BG-3500", price: 35000 },
+                { id: 4, name: "LED Display Panel", category: "Signage", model: "LD-P100", price: 22000 },
+                { id: 5, name: "PZQube Slot Sensor", category: "Parking Sensor", model: "PZQ-S10", price: 5500 },
+                { id: 6, name: "Loop Detector", category: "Sensor", model: "LD-100", price: 3800 },
+                { id: 7, name: "QR Code Scanner", category: "Access Control", model: "QR-1200", price: 7500 },
+                { id: 8, name: "Network Switch", category: "Network", model: "NS-24P", price: 9800 }
+            ],
+            software: [
+                { id: 1, name: "Parking Management System", category: "Core System", version: "v4.2", price: 75000 },
+                { id: 2, name: "ANPR Software", category: "Recognition", version: "v2.1", price: 45000 },
+                { id: 3, name: "Payment Gateway Integration", category: "Payment", version: "v3.0", price: 25000 },
+                { id: 4, name: "Mobile App", category: "User Interface", version: "v2.5", price: 35000 },
+                { id: 5, name: "Real-time Analytics", category: "Business Intelligence", version: "v1.8", price: 28000 },
+                { id: 6, name: "Cloud Storage & Backup", category: "Infrastructure", version: "v3.2", price: 18000 }
+            ],
+            services: [
+                { id: 1, name: "System Installation", category: "Installation", description: "Complete system setup and configuration", price: 45000 },
+                { id: 2, name: "Staff Training", category: "Training", description: "On-site training for operational staff", price: 25000 },
+                { id: 3, name: "Network Cabling", category: "Infrastructure", description: "CAT6 cable installation per meter", price: 250 },
+                { id: 4, name: "Preventive Maintenance", category: "Maintenance", description: "Quarterly system check", price: 15000 },
+                { id: 5, name: "Software Customization", category: "Development", description: "Custom feature development", price: 35000 }
+            ]
+        };
+
+        // AMC rates (percentage of hardware + software)
+        const amcRates = {
+            standard: 0.12,  // 12% 
+            enhanced: 0.15,  // 15%
+            premium: 0.18    // 18%
+        };
+
+        $(document).ready(function() {
+            // Update solution title based on selected menu item
+            $(".dropdown-item").click(function(e) {
+                e.preventDefault();
+                $("#solution-title").text($(this).text());
+                $("#project-name").text($(this).text() + " Project");
+            });
+
+            // Update approach and budget display from dropdown
+            $("#approach").change(function() {
+                $("#approach-display").text($(this).find("option:selected").text());
+                updateTotals();
+            });
+
+            $("#budget").change(function() {
+                $("#budget-display").text($(this).find("option:selected").text());
+                updateTotals();
+            });
+
+            // Set current date
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            $("#date-display").text(today.toLocaleDateString('en-US', options));
+
+            // Mobile menu toggle
+            $("#mobile-toggle").click(function() {
+                $("#sidebar").toggleClass("mobile-open");
+            });
+
+            // Make nav items expandable
+            $(".nav-item .nav-link").click(function(e) {
+                e.preventDefault();
+                $(this).parent().toggleClass("active");
+                $(this).parent().siblings().removeClass("active");
+            });
+
+            // Search hardware products
+            $("#search-hw-btn").click(function() {
+                const searchTerm = $("#hardware-search").val().toLowerCase();
+                const results = productDatabase.hardware.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.category.toLowerCase().includes(searchTerm)
+                );
+                
+                displaySearchResults(results, "hardware");
+            });
+
+            // Search software products
+            $("#search-sw-btn").click(function() {
+                const searchTerm = $("#software-search").val().toLowerCase();
+                const results = productDatabase.software.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.category.toLowerCase().includes(searchTerm)
+                );
+                
+                displaySearchResults(results, "software");
+            });
+
+            // Search service products
+            $("#search-svc-btn").click(function() {
+                const searchTerm = $("#service-search").val().toLowerCase();
+                const results = productDatabase.services.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.category.toLowerCase().includes(searchTerm)
+                );
+                
+                displaySearchResults(results, "service");
+            });
+
+            // Handle AMC changes
+            $("#amc-plan, #amc-duration").change(function() {
+                updateTotals();
+            });
+
+            // Download as PDF
+            $("#download-pdf").click(function() {
+                generatePDF();
+            });
+
+            // Download as Excel
+            $("#download-excel").click(function() {
+                generateExcel();
+            });
+
+            // Download as CSV
+            $("#download-csv").click(function() {
+                generateCSV();
+            });
+        });
+
+        // Function to display search results
+        function displaySearchResults(results, type) {
+            const resultsContainer = $(`#${type}-search-results`);
+            resultsContainer.empty();
+            
+            if (results.length === 0) {
+                resultsContainer.append(`<div class="search-result-item">No matching products found</div>`);
+            } else {
+                results.forEach(item => {
+                    let itemDetails = '';
+                    if (type === 'hardware') {
+                        itemDetails = `${item.name} - ${item.model} - ₹${item.price.toLocaleString()}`;
+                    } else if (type === 'software') {
+                        itemDetails = `${item.name} - ${item.version} - ₹${item.price.toLocaleString()}`;
+                    } else if (type === 'service') {
+                        itemDetails = `${item.name} - ${item.description} - ₹${item.price.toLocaleString()}`;
+                    }
+                    
+                    resultsContainer.append(`
+                        <div class="search-result-item" data-id="${item.id}" data-type="${type}">
+                            ${itemDetails}
+                        </div>
+                    `);
+                });
+            }
+            
+            resultsContainer.addClass('active');
+            
+            // Add click event to search results
+            $(".search-result-item").click(function() {
+                const itemId = $(this).data('id');
+                const itemType = $(this).data('type');
+                
+                if (itemId) {
+                    addProduct(itemId, itemType);
+                    $(`#${itemType}-search-results`).removeClass('active');
+                    $(`#${itemType}-search`).val('');
+                }
+            });
+        }
+
+        // Function to add product to the selected table
+        function addProduct(id, type) {
+            const productList = productDatabase[type === 'hardware' ? 'hardware' : type === 'software' ? 'software' : 'services'];
+            const product = productList.find(item => item.id === id);
+            
+            if (!product) return;
+            
+            // Check if product already exists in table
+            const existingRow = $(`#${type}-table tbody tr[data-id="${id}"]`);
+            
+            if (existingRow.length > 0) {
+                // Update quantity if already exists
+                const qtyInput = existingRow.find('.qty-input');
+                const currentQty = parseInt(qtyInput.val());
+                qtyInput.val(currentQty + 1);
+                updateRowTotal(existingRow, product.price, currentQty + 1);
+            } else {
+                // Add new row
+                let newRow = `<tr data-id="${id}" data-price="${product.price}">`;
+                
+                if (type === 'hardware') {
+                    newRow += `
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${product.model}</td>
+                        <td>₹${product.price.toLocaleString()}</td>
+                        <td><input type="number" class="qty-input" min="1" value="1" style="width: 60px;"></td>
+                        <td class="row-total">₹${product.price.toLocaleString()}</td>
+                        <td class="action-btns">
+                            <button class="btn-remove"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                } else if (type === 'software') {
+                    newRow += `
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${product.version}</td>
+                        <td>₹${product.price.toLocaleString()}</td>
+                        <td><input type="number" class="qty-input" min="1" value="1" style="width: 60px;"></td>
+                        <td class="row-total">₹${product.price.toLocaleString()}</td>
+                        <td class="action-btns">
+                            <button class="btn-remove"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                } else if (type === 'service') {
+                    newRow += `
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${product.description}</td>
+                        <td>₹${product.price.toLocaleString()}</td>
+                        <td><input type="number" class="qty-input" min="1" value="1" style="width: 60px;"></td>
+                        <td class="row-total">₹${product.price.toLocaleString()}</td>
+                        <td class="action-btns">
+                            <button class="btn-remove"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                }
+                
+                newRow += `</tr>`;
+                $(`#${type}-table tbody`).append(newRow);
+                
+                // Add event listeners for new row
+                const row = $(`#${type}-table tbody tr:last-child`);
+                
+                row.find('.qty-input').change(function() {
+                    const qty = parseInt($(this).val());
+                    updateRowTotal(row, product.price, qty);
+                });
+                
+                row.find('.btn-remove').click(function() {
+                    row.remove();
+                    updateTotals();
+                });
+            }
+            
+            updateTotals();
+        }
+
+        // Update row total based on quantity
+        function updateRowTotal(row, price, qty) {
+            const total = price * qty;
+            row.find('.row-total').text(`₹${total.toLocaleString()}`);
+            updateTotals();
+        }
+
+        // Update all totals
+        function updateTotals() {
+            let hardwareTotal = 0;
+            let softwareTotal = 0;
+            let serviceTotal = 0;
+            
+            // Calculate hardware total
+            $("#hardware-table tbody tr").each(function() {
+                const price = parseFloat($(this).data('price'));
+                const qty = parseInt($(this).find('.qty-input').val());
+                hardwareTotal += price * qty;
+            });
+            
+            // Calculate software total
+            $("#software-table tbody tr").each(function() {
+                const price = parseFloat($(this).data('price'));
+                const qty = parseInt($(this).find('.qty-input').val());
+                softwareTotal += price * qty;
+            });
+            
+            // Calculate service total
+            $("#service-table tbody tr").each(function() {
+                const price = parseFloat($(this).data('price'));
+                const qty = parseInt($(this).find('.qty-input').val());
+                serviceTotal += price * qty;
+            });
+            
+            // Calculate AMC total
+            const amcPlan = $("#amc-plan").val();
+            const amcDuration = parseInt($("#amc-duration").val());
+            const amcRate = amcRates[amcPlan];
+            const amcTotal = (hardwareTotal + softwareTotal) * amcRate * amcDuration;
+            
+            // Update displays
+            $("#hardware-total").text(`₹${hardwareTotal.toLocaleString()}`);
+            $("#software-total").text(`₹${softwareTotal.toLocaleString()}`);
+            $("#service-total").text(`₹${serviceTotal.toLocaleString()}`);
+            $("#amc-total").text(`₹${amcTotal.toLocaleString()}`);
+            
+            // Calculate grand total
+            const grandTotal = hardwareTotal + softwareTotal + serviceTotal + amcTotal;
+            $("#grand-total").text(`₹${grandTotal.toLocaleString()}`);
+        }
+
+        // Generate PDF function
+        function generatePDF() {
+            // Using jsPDF and html2canvas
+            window.jspdf = window.jspdf || {};
+            
+            const { jsPDF } = window.jspdf;
+            
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const elementToExport = document.querySelector('.template-container');
+            
+            html2canvas(elementToExport).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 190;
+                const pageHeight = 295;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 10;
+                
+                doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                doc.save(`${$("#solution-title").text()}_${new Date().toISOString().split('T')[0]}.pdf`);
+            });
+        }
+
+        // Generate Excel function
+        function generateExcel() {
+            const workbook = XLSX.utils.book_new();
+            const solutionName = $("#solution-title").text();
+            
+            // Create hardware sheet
+            const hardwareData = [];
+            hardwareData.push(["Product Name", "Category", "Model", "Price", "Quantity", "Total"]);
+            
+            $("#hardware-table tbody tr").each(function() {
+                const row = [
+                    $(this).find('td:eq(0)').text(),
+                    $(this).find('td:eq(1)').text(),
+                    $(this).find('td:eq(2)').text(),
+                    $(this).find('td:eq(3)').text(),
+                    $(this).find('.qty-input').val(),
+                    $(this).find('.row-total').text()
+                ];
+                hardwareData.push(row);
+            });
+            
+            // Create software sheet
+            const softwareData = [];
+            softwareData.push(["Product Name", "Category", "Version", "Price", "Quantity", "Total"]);
+            
+            $("#software-table tbody tr").each(function() {
+                const row = [
+                    $(this).find('td:eq(0)').text(),
+                    $(this).find('td:eq(1)').text(),
+                    $(this).find('td:eq(2)').text(),
+                    $(this).find('td:eq(3)').text(),
+                    $(this).find('.qty-input').val(),
+                    $(this).find('.row-total').text()
+                ];
+                softwareData.push(row);
+            });
+            
+            // Create services sheet
+            const servicesData = [];
+            servicesData.push(["Service Name", "Category", "Description", "Price", "Quantity", "Total"]);
+            
+            $("#service-table tbody tr").each(function() {
+                const row = [
+                    $(this).find('td:eq(0)').text(),
+                    $(this).find('td:eq(1)').text(),
+                    $(this).find('td:eq(2)').text(),
+                    $(this).find('td:eq(3)').text(),
+                    $(this).find('.qty-input').val(),
+                    $(this).find('.row-total').text()
+                ];
+                servicesData.push(row);
+            });
+            
+            // Create summary sheet
+            const summaryData = [];
+            summaryData.push(["Project:", $("#project-name").text()]);
+            summaryData.push(["Approach:", $("#approach-display").text()]);
+            summaryData.push(["Budget:", $("#budget-display").text()]);
+            summaryData.push(["Date:", $("#date-display").text()]);
+            summaryData.push([]);
+            summaryData.push(["Hardware Total:", $("#hardware-total").text()]);
+            summaryData.push(["Software Total:", $("#software-total").text()]);
+            summaryData.push(["Services Total:", $("#service-total").text()]);
+            summaryData.push(["AMC Total:", $("#amc-total").text()]);
+            summaryData.push(["Grand Total:", $("#grand-total").text()]);
+            
+            // Add sheets to workbook
+            const hardwareSheet = XLSX.utils.aoa_to_sheet(hardwareData);
+            const softwareSheet = XLSX.utils.aoa_to_sheet(softwareData);
+            const servicesSheet = XLSX.utils.aoa_to_sheet(servicesData);
+            const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+            
+            XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
+            XLSX.utils.book_append_sheet(workbook, hardwareSheet, "Hardware");
+            XLSX.utils.book_append_sheet(workbook, softwareSheet, "Software");
+            XLSX.utils.book_append_sheet(workbook, servicesSheet, "Services");
+            
+            // Save workbook
+            XLSX.writeFile(workbook, `${solutionName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        // Generate CSV function
+        function generateCSV() {
+            // Combine all data for CSV
+            const csvRows = [];
+            
+            // Add header
+            csvRows.push(`"Project: ${$("#project-name").text()}"`);
+            csvRows.push(`"Approach: ${$("#approach-display").text()}"`);
+            csvRows.push(`"Budget: ${$("#budget-display").text()}"`);
+            csvRows.push(`"Date: ${$("#date-display").text()}"`);
+            csvRows.push('');
+            
+            // Add hardware section
+            csvRows.push('"HARDWARE COMPONENTS"');
+            csvRows.push('"Product Name","Category","Model","Price","Quantity","Total"');
+            
+            $("#hardware-table tbody tr").each(function() {
+                const row = [
+                    `"${$(this).find('td:eq(0)').text()}"`,
+                    `"${$(this).find('td:eq(1)').text()}"`,
+                    `"${$(this).find('td:eq(2)').text()}"`,
+                    `"${$(this).find('td:eq(3)').text()}"`,
+                    `"${$(this).find('.qty-input').val()}"`,
+                    `"${$(this).find('.row-total').text()}"`
+                ];
+                csvRows.push(row.join(','));
+            });
+            csvRows.push('');
+            
+            // Add software section
+            csvRows.push('"SOFTWARE COMPONENTS"');
+            csvRows.push('"Product Name","Category","Version","Price","Quantity","Total"');
+            
+            $("#software-table tbody tr").each(function() {
+                const row = [
+                    `"${$(this).find('td:eq(0)').text()}"`,
+                    `"${$(this).find('td:eq(1)').text()}"`,
+                    `"${$(this).find('td:eq(2)').text()}"`,
+                    `"${$(this).find('td:eq(3)').text()}"`,
+                    `"${$(this).find('.qty-input').val()}"`,
+                    `"${$(this).find('.row-total').text()}"`
+                ];
+                csvRows.push(row.join(','));
+            });
+            csvRows.push('');
+            
+            // Add services section
+            csvRows.push('"SERVICES"');
+            csvRows.push('"Service Name","Category","Description","Price","Quantity","Total"');
+            
+            $("#service-table tbody tr").each(function() {
+                const row = [
+                    `"${$(this).find('td:eq(0)').text()}"`,
+                    `"${$(this).find('td:eq(1)').text()}"`,
+                    `"${$(this).find('td:eq(2)').text()}"`,
+                    `"${$(this).find('td:eq(3)').text()}"`,
+                    `"${$(this).find('.qty-input').val()}"`,
+                    `"${$(this).find('.row-total').text()}"`
+                ];
+                csvRows.push(row.join(','));
+            });
+            csvRows.push('');
+            
+            // Add summary section
+            csvRows.push('"SUMMARY"');
+            csvRows.push(`"Hardware Total:","${$("#hardware-total").text()}"`);
+            csvRows.push(`"Software Total:","${$("#software-total").text()}"`);
+            csvRows.push(`"Services Total:","${$("#service-total").text()}"`);
+            csvRows.push(`"AMC Total:","${$("#amc-total").text()}"`);
+            csvRows.push(`"Grand Total:","${$("#grand-total").text()}"`);
+            
+            // Create CSV content
+            const csvContent = csvRows.join('\n');
+            
+            // Create download link
+            const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `${$("#solution-title").text()}_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
